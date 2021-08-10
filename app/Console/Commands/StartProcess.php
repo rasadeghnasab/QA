@@ -59,10 +59,21 @@ class StartProcess extends Command
                 } while ($continue === true);
             } elseif ($input === 'Stats') {
                 $this->stats();
+            } elseif ($input === 'Reset') {
+                $this->reset();
             }
 
             $stay = $this->shouldStay($input);
         } while ($stay);
+    }
+
+    private function reset()
+    {
+        if (!$this->confirm('Are you sure? (You can not undo this action')) {
+            return false;
+        }
+
+        $this->user->questions()->update(['status' => 'Not answered']);
     }
 
     private function stats()
@@ -180,6 +191,7 @@ class StartProcess extends Command
                 'List all questions',
                 'Practice',
                 'Stats',
+                'Reset',
                 'Exit'
             ],
             $defaultIndex
