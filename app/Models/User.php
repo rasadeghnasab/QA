@@ -41,11 +41,6 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function practices()
-    {
-        return $this->hasMany(Practice::class);
-    }
-
     public function questions()
     {
         return $this->hasMany(Question::class);

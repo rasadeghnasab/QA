@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Practice;
 use App\Models\User;
 use Illuminate\Console\Command;
 use App\Models\Question;
@@ -64,16 +63,10 @@ class StartProcess extends Command
 
     public function practice()
     {
-//        $practices = $this->user->practices()->with('question')->get();
-//        $questions = Question::whereHas('practices', function ($query) {
-//            $query->where('user_id', $this->user->id);
-//        })->get();
-
-        $questions = $this->user->questions()->with('practices')->get();
+        $practices = $this->user->questions;
 //        dd($this->user->questions->pluck('id'));
-//        dd(Practice::whereIn('question_id', $this->user->questions->pluck('id'))->get()->toArray());
 //        $questions = Question::where('with('practices')
-        dd($questions->toArray());
+        dd($practices->toArray());
 //        dd($practices->toArray());
 
         $this->customTable();

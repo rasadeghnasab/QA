@@ -10,9 +10,4 @@ class Question extends Model
     use HasFactory;
 
     protected $fillable = ['body', 'answer'];
-
-    public function practices()
-    {
-        return $this->hasMany(Practice::class);
-    }
 }
