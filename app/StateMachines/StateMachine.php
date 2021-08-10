@@ -38,7 +38,7 @@ class StateMachine implements MachineInterface
     public function start(Command $command)
     {
         $action = $this->currentState->handle($command);
-        while ($action) {
+        while ($action !== 'Exit') {
             try {
                 $state = $this->next($action);
                 $this->currentState = $state;

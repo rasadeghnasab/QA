@@ -7,11 +7,11 @@ use Illuminate\Console\Command;
 
 class ExitApp implements StateInterface
 {
-    public function handle(Command $command): bool
+    public function handle(Command $command): string
     {
-        $command->info('Goodbye my friend.');
+        $command->info(sprintf('Goodbye `%s`.', $command->user()->name));
 
-        return false;
+        return 'Exit';
     }
 
     public function getName(): string

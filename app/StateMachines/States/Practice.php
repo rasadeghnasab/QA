@@ -7,7 +7,7 @@ use Illuminate\Console\Command;
 
 class Practice implements StateInterface
 {
-    public function handle(Command $command): string|bool
+    public function handle(Command $command): string
     {
         $practices = $command->user()->questions()->get(['id', 'body', 'status', 'answer']);
 

@@ -3,6 +3,7 @@
 namespace App\StateMachines\Machines;
 
 use App\StateMachines\Interfaces\MachineInterface;
+use App\StateMachines\States\AddQuestion;
 use App\StateMachines\States\Authenticate;
 use App\StateMachines\States\ExitApp;
 use App\StateMachines\States\ListQuestions;
@@ -33,6 +34,7 @@ class QAMachine
         $listQuestions = new ListQuestions();
         $reset = new Reset();
         $practice = new Practice();
+        $addQuestion = new AddQuestion();
 
         // if you remove the onlyEmail it will prompt for email and password
         // but now authentication system only ask for the password
@@ -40,21 +42,27 @@ class QAMachine
 
         $this->machine->setInitialState($authentication);
 
-        $this->machine->addTransition(new Transition('Exit', $mainMenu, $exit));
-        $this->machine->addTransition(new Transition('Stats', $mainMenu, $stats));
-        $this->machine->addTransition(new Transition('List questions', $mainMenu, $listQuestions));
-        $this->machine->addTransition(new Transition('Reset', $mainMenu, $reset));
         $this->machine->addTransition(new Transition('Authenticate', $authentication, $authentication));
 
+        // main menu
+        $this->machine->addTransition(new Transition('Create a question', $mainMenu, $addQuestion));
+        $this->machine->addTransition(new Transition('List questions', $mainMenu, $listQuestions));
         $this->machine->addTransition(new Transition('Practice', $mainMenu, $practice));
+        $this->machine->addTransition(new Transition('Stats', $mainMenu, $stats));
+        $this->machine->addTransition(new Transition('Reset', $mainMenu, $reset));
+        $this->machine->addTransition(new Transition('Exit', $mainMenu, $exit));
+
+        // recursive
         $this->machine->addTransition(new Transition('Continue', $practice, $practice));
+        $this->machine->addTransition(new Transition('Continue', $addQuestion, $addQuestion));
 
         // automatically return to the main menu
-        $this->machine->addTransition(new Transition('MainMenu', $stats, $mainMenu));
-        $this->machine->addTransition(new Transition('MainMenu', $listQuestions, $mainMenu));
-        $this->machine->addTransition(new Transition('MainMenu', $reset, $mainMenu));
-        $this->machine->addTransition(new Transition('MainMenu', $practice, $mainMenu));
         $this->machine->addTransition(new Transition('MainMenu', $authentication, $mainMenu));
+        $this->machine->addTransition(new Transition('MainMenu', $addQuestion, $mainMenu));
+        $this->machine->addTransition(new Transition('MainMenu', $listQuestions, $mainMenu));
+        $this->machine->addTransition(new Transition('MainMenu', $practice, $mainMenu));
+        $this->machine->addTransition(new Transition('MainMenu', $stats, $mainMenu));
+        $this->machine->addTransition(new Transition('MainMenu', $reset, $mainMenu));
     }
 
     public function start(Command $command)

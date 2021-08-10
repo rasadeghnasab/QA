@@ -8,7 +8,7 @@ use Illuminate\Console\Command;
 
 class AddQuestion implements StateInterface
 {
-    public function handle(Command $command): string|bool
+    public function handle(Command $command): string
     {
         $body = $command->ask('Enter your question body please');
 
@@ -23,7 +23,7 @@ class AddQuestion implements StateInterface
 
         $command->info('The question has been added successfully.');
 
-        return $command->confirm('Add another one?', true);
+        return $command->confirm('Add another one?', true) ? 'Continue' : 'MainMenu';
     }
 
     public function getName(): string

@@ -7,7 +7,7 @@ use Illuminate\Console\Command;
 
 class ListQuestions implements StateInterface
 {
-    public function handle(Command $command): string|bool
+    public function handle(Command $command): string
     {
         $questions = $command->user()->questions()->get(['id', 'body'])->toArray();
 

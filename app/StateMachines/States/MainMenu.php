@@ -7,7 +7,7 @@ use Illuminate\Console\Command;
 
 class MainMenu implements StateInterface
 {
-    public function handle(Command $command): string|bool
+    public function handle(Command $command): string
     {
         $defaultIndex = 0;
         $choice = $command->choice(

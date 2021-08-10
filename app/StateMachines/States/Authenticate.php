@@ -11,7 +11,7 @@ class Authenticate implements StateInterface
 {
     private bool $onlyEmail;
 
-    public function handle(Command $command): string|bool
+    public function handle(Command $command): string
     {
         $email = $command->ask('Enter your email address', 'test@test.com');
         $user = User::where('email', $email)->first();

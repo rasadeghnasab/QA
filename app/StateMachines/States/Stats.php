@@ -7,7 +7,7 @@ use Illuminate\Console\Command;
 
 class Stats implements StateInterface
 {
-    public function handle(Command $command): string|bool
+    public function handle(Command $command): string
     {
         $questions = $command->user()->questions()->get();
 
