@@ -14,8 +14,9 @@ class ListQuestions implements StateInterface
         $command->titledTable(
             ['ID', 'Question'],
             $questions,
-            'borderless',
             'Questions',
+            '',
+            'borderless',
         );
 
         return 'MainMenu';
