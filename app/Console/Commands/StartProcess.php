@@ -47,10 +47,6 @@ class StartProcess extends Command
         do {
             $input = $this->mainMenu();
 
-            if ($input) {
-                $this->clearScreen();
-            }
-
             if ($input === 'Create a question') {
                 do {
                     $continue = $this->addAQuestion();
@@ -200,6 +196,7 @@ class StartProcess extends Command
             $defaultIndex
         );
 
+        $this->clearScreen();
 //        $this->info(sprintf('You choose %s', $choice));
 
         return $choice;
