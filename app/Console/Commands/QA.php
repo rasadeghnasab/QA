@@ -6,7 +6,6 @@ use App\Models\User;
 use App\StateMachines\Machines\QAMachine;
 use App\StateMachines\StateMachine;
 use Illuminate\Console\Command;
-use App\Models\Question;
 use Illuminate\Contracts\Support\Arrayable;
 use Symfony\Component\Console\Helper\Table;
 
@@ -43,6 +42,11 @@ class QA extends Command
     public function user(): User
     {
         return $this->user;
+    }
+
+    public function setUser(User $user): void
+    {
+        $this->user = $user;
     }
 
     /**
