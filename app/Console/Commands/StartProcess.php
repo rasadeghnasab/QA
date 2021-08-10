@@ -57,10 +57,26 @@ class StartProcess extends Command
                 do {
                     $continue = $this->practice();
                 } while ($continue === true);
+            } elseif ($input === 'Stats') {
+                $this->stats();
             }
 
             $stay = $this->shouldStay($input);
         } while ($stay);
+    }
+
+    private function stats()
+    {
+        $questions = $this->user->questions;
+
+        $all = $questions->count();
+        $answered = $questions->where('status', 'Incorrect')->count();
+        $correct = $questions->where('status', 'Correct')->count();
+
+        $this->info(sprintf('Total: %s', $questions->count()));
+        $this->info(sprintf('Answered: %%%s', number_format($answered * 100 / $all)));
+        $this->info(sprintf('Correct: %%%s', number_format($correct * 100 / $all)));
+        $this->newLine();
     }
 
     public function practice()
@@ -163,6 +179,7 @@ class StartProcess extends Command
                 'Create a question',
                 'List all questions',
                 'Practice',
+                'Stats',
                 'Exit'
             ],
             $defaultIndex
