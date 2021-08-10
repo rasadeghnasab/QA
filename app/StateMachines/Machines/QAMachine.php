@@ -33,7 +33,10 @@ class QAMachine
         $listQuestions = new ListQuestions();
         $reset = new Reset();
         $practice = new Practice();
-        $authentication = new Authenticate();
+
+        // if you remove the onlyEmail it will prompt for email and password
+        // but now authentication system only ask for the password
+        $authentication = (new Authenticate())->onlyEmail();
 
         $this->machine->setInitialState($authentication);
 

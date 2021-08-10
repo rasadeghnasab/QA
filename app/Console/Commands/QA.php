@@ -23,7 +23,7 @@ class QA extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Q&A app made with Laravel + Artisan';
 
     private User $user;
 
@@ -35,8 +35,6 @@ class QA extends Command
     public function __construct()
     {
         parent::__construct();
-
-        $this->user = User::where('id', 1)->first() ?? new User(['id' => 1]);
     }
 
     public function user(): User
@@ -56,7 +54,7 @@ class QA extends Command
      */
     public function handle()
     {
-        $machine = new QAMachine(new StateMachine());
+        $machine = app()->make('QAStateMachine');
 
         $machine->start($this);
     }
