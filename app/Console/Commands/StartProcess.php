@@ -47,6 +47,10 @@ class StartProcess extends Command
         do {
             $input = $this->mainMenu();
 
+            if ($input) {
+                $this->clearScreen();
+            }
+
             if ($input === 'Create a question') {
                 do {
                     $continue = $this->addAQuestion();
@@ -74,19 +78,26 @@ class StartProcess extends Command
         }
 
         $this->user->questions()->update(['status' => 'Not answered']);
+        $this->warn('Your questions are marked as `Not answered`.');
     }
 
     private function stats()
     {
-        $questions = $this->user->questions;
+        $questions = $this->user->questions()->all();
 
         $all = $questions->count();
         $answered = $questions->where('status', 'Incorrect')->count();
         $correct = $questions->where('status', 'Correct')->count();
 
-        $this->info(sprintf('Total: %s', $questions->count()));
-        $this->info(sprintf('Answered: %%%s', number_format($answered * 100 / $all)));
-        $this->info(sprintf('Correct: %%%s', number_format($correct * 100 / $all)));
+        $this->info("{$all}, {$answered}, {$correct}");
+
+        $this->customTable(['Header', 'Value'], [
+            ['Total', $questions->count()],
+            ['Answered', sprintf('%%%s', number_format($answered * 100 / $all))],
+            ['Correct', sprintf('%%%s', number_format($correct * 100 / $all))]
+        ],
+            'Stats'
+        );
         $this->newLine();
     }
 
@@ -103,7 +114,6 @@ class StartProcess extends Command
             $practices->map(function ($question) {
                 return $question->only(['id', 'body', 'status']);
             }),
-            'default',
             'Practices',
             $completion
         );
@@ -210,10 +220,9 @@ class StartProcess extends Command
      * @param string $tableStyle
      * @param string $header
      * @param string $footer
-     * @param array $columnStyles
      * @return void
      */
-    public function customTable($headers, $rows, $tableStyle = 'default', string $header = '', string $footer = '')
+    public function customTable($headers, $rows, string $header = '', string $footer = '', $tableStyle = 'default')
     {
         $table = new Table($this->output);
 
@@ -234,4 +243,8 @@ class StartProcess extends Command
         $table->render();
     }
 
+    private function clearScreen()
+    {
+        system('clear');
+    }
 }
