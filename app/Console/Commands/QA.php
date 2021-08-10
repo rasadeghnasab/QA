@@ -10,7 +10,7 @@ use App\Models\Question;
 use Illuminate\Contracts\Support\Arrayable;
 use Symfony\Component\Console\Helper\Table;
 
-class StartProcess extends Command
+class QA extends Command
 {
     /**
      * The name and signature of the console command.
