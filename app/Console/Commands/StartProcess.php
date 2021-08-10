@@ -54,7 +54,9 @@ class StartProcess extends Command
             } elseif ($input === 'List all questions') {
                 $this->listQuestions();
             } elseif ($input === 'Practice') {
-                $this->practice();
+                do {
+                    $continue = $this->practice();
+                } while ($continue === true);
             }
 
             $stay = $this->shouldStay($input);
@@ -63,18 +65,54 @@ class StartProcess extends Command
 
     public function practice()
     {
-        $practices = $this->user->questions;
-//        dd($this->user->questions->pluck('id'));
-//        $questions = Question::where('with('practices')
-        dd($practices->toArray());
-//        dd($practices->toArray());
+        $practices = $this->user->questions()->get(['id', 'body', 'status', 'answer']);
 
-        $this->customTable();
+        $correct = $practices->where('status', 'Correct');
+
+        $completion = sprintf('%%%d', number_format($correct->count() * 100 / $practices->count()));
+
+        $this->customTable(
+            ['ID', 'Question', 'Status'],
+            $practices->map(function ($question) {
+                return $question->only(['id', 'body', 'status']);
+            }),
+            'default',
+            'Practices',
+            $completion
+        );
+
+        $notCorrectPractices = $practices->where('status', '!=', 'Correct');
+        $firstNotCorrect = $notCorrectPractices->first();
+
+
+        $selected = $this->choice('Choose one of the question above',
+            $notCorrectPractices->pluck('body', 'id')->toArray(),
+            $firstNotCorrect->id,
+        );
+
+        $question = $notCorrectPractices->where('body', $selected)->first();
+
+        $userAnswer = $this->ask($question->body);
+
+        $status = 'Correct';
+        if ($question->answer === $userAnswer) {
+            $this->info($status);
+        } else {
+            $status = 'Incorrect';
+            $this->error($status);
+        }
+
+        $question->status = $status;
+        $question->save();
+
+        $this->newLine(2);
+
+        return $this->confirm('Continue?', true);
     }
 
     private function listQuestions()
     {
-        $questions = Question::get(['id', 'body'])->toArray();
+        $questions = $this->user->questions()->get(['id', 'body'])->toArray();
 
         $this->customTable(
             ['ID', 'Question'],
@@ -102,7 +140,7 @@ class StartProcess extends Command
         $this->question($answer);
         $this->newLine(2);
 
-        return $this->continue();
+        return $this->confirm('Add another one?', true);
     }
 
     private function shouldStay($input): bool
@@ -116,18 +154,6 @@ class StartProcess extends Command
         return false;
     }
 
-    private function continue(): bool
-    {
-        $defaultIndex = 'Continue';
-        $choice = $this->choice('Do you want to continue?',
-            [
-                'Continue',
-                'Back',
-            ], $defaultIndex);
-
-        return $choice === 'Continue';
-    }
-
     private function mainMenu()
     {
         $defaultIndex = 1;
@@ -137,8 +163,6 @@ class StartProcess extends Command
                 'Create a question',
                 'List all questions',
                 'Practice',
-                'Stats',
-                'Reset',
                 'Exit'
             ],
             $defaultIndex
