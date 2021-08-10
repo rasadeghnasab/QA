@@ -83,7 +83,7 @@ class StartProcess extends Command
         $answered = $questions->where('status', 'Incorrect')->count();
         $correct = $questions->where('status', 'Correct')->count();
 
-        $this->customTable(['Header', 'Value'], [
+        $this->titledTable(['Header', 'Value'], [
             ['Total', $questions->count()],
             ['Answered', sprintf('%%%s', number_format($answered * 100 / $all))],
             ['Correct', sprintf('%%%s', number_format($correct * 100 / $all))]
@@ -101,7 +101,7 @@ class StartProcess extends Command
 
         $completion = sprintf('%%%d', number_format($correct->count() * 100 / $practices->count()));
 
-        $this->customTable(
+        $this->titledTable(
             ['ID', 'Question', 'Status'],
             $practices->map(function ($question) {
                 return $question->only(['id', 'body', 'status']);
@@ -143,7 +143,7 @@ class StartProcess extends Command
     {
         $questions = $this->user->questions()->get(['id', 'body'])->toArray();
 
-        $this->customTable(
+        $this->titledTable(
             ['ID', 'Question'],
             $questions,
             'borderless',
@@ -197,7 +197,6 @@ class StartProcess extends Command
         );
 
         $this->clearScreen();
-//        $this->info(sprintf('You choose %s', $choice));
 
         return $choice;
     }
@@ -212,7 +211,7 @@ class StartProcess extends Command
      * @param string $footer
      * @return void
      */
-    public function customTable($headers, $rows, string $header = '', string $footer = '', $tableStyle = 'default')
+    public function titledTable($headers, $rows, string $header = '', string $footer = '', $tableStyle = 'default')
     {
         $table = new Table($this->output);
 
