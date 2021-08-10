@@ -1,0 +1,28 @@
+<?php
+
+namespace App\StateMachines\States;
+
+use App\StateMachines\Interfaces\StateInterface;
+use Illuminate\Console\Command;
+
+class ListQuestions implements StateInterface
+{
+    public function handle(Command $command): string|bool
+    {
+        $questions = $command->user()->questions()->get(['id', 'body'])->toArray();
+
+        $command->titledTable(
+            ['ID', 'Question'],
+            $questions,
+            'borderless',
+            'Questions',
+        );
+
+        return 'MainMenu';
+    }
+
+    public function getName(): string
+    {
+        return self::class;
+    }
+}
