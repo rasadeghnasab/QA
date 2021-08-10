@@ -50,7 +50,7 @@ class Practice implements StateInterface
 
         $command->newLine(2);
 
-        return $command->confirm('Continue?', true) ? 'Continue' : 'MainMenu';
+        return $command->confirm('Continue?', true) ? 'Practice' : 'MainMenu';
     }
 
     public function getName(): string

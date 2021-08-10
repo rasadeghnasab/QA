@@ -23,7 +23,7 @@ class AddQuestion implements StateInterface
 
         $command->info('The question has been added successfully.');
 
-        return $command->confirm('Add another one?', true) ? 'Continue' : 'MainMenu';
+        return $command->confirm('Add another one?', true) ? 'Create a question' : 'MainMenu';
     }
 
     public function getName(): string
