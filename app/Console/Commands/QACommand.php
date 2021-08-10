@@ -3,13 +3,11 @@
 namespace App\Console\Commands;
 
 use App\Models\User;
-use App\StateMachines\Machines\QAMachine;
-use App\StateMachines\StateMachine;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Support\Arrayable;
 use Symfony\Component\Console\Helper\Table;
 
-class QA extends Command
+class QACommand extends Command
 {
     /**
      * The name and signature of the console command.
@@ -27,16 +25,6 @@ class QA extends Command
 
     private User $user;
 
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function user(): User
     {
         return $this->user;
@@ -50,7 +38,6 @@ class QA extends Command
     /**
      * Execute the console command.
      *
-     * @return int
      */
     public function handle()
     {
@@ -63,10 +50,10 @@ class QA extends Command
      * Format input to textual table.
      *
      * @param array $headers
-     * @param \Illuminate\Contracts\Support\Arrayable|array $rows
-     * @param string $tableStyle
+     * @param Arrayable|array $rows
      * @param string $header
      * @param string $footer
+     * @param string $tableStyle
      * @return void
      */
     public function titledTable($headers, $rows, string $header = '', string $footer = '', $tableStyle = 'default')
