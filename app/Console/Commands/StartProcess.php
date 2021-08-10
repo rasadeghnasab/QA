@@ -47,10 +47,6 @@ class StartProcess extends Command
         do {
             $input = $this->mainMenu();
 
-            if ($input) {
-                $this->clearScreen();
-            }
-
             if ($input === 'Create a question') {
                 do {
                     $continue = $this->addAQuestion();
@@ -66,9 +62,7 @@ class StartProcess extends Command
             } elseif ($input === 'Reset') {
                 $this->reset();
             }
-
-            $stay = $this->shouldStay($input);
-        } while ($stay);
+        } while ($this->shouldStay($input));
     }
 
     private function reset()
@@ -83,13 +77,11 @@ class StartProcess extends Command
 
     private function stats()
     {
-        $questions = $this->user->questions()->all();
+        $questions = $this->user->questions()->get();
 
         $all = $questions->count();
         $answered = $questions->where('status', 'Incorrect')->count();
         $correct = $questions->where('status', 'Correct')->count();
-
-        $this->info("{$all}, {$answered}, {$correct}");
 
         $this->customTable(['Header', 'Value'], [
             ['Total', $questions->count()],
@@ -172,10 +164,7 @@ class StartProcess extends Command
             ])
         );
 
-        $this->newLine();
-        $this->question($body);
-        $this->question($answer);
-        $this->newLine(2);
+        $this->info('The question has been added successfully.');
 
         return $this->confirm('Add another one?', true);
     }
@@ -186,14 +175,14 @@ class StartProcess extends Command
             return true;
         }
 
-        $this->error(sprintf('Good by my friend'));
+        $this->info(sprintf('Good by my friend'));
 
         return false;
     }
 
     private function mainMenu()
     {
-        $defaultIndex = 1;
+        $defaultIndex = 0;
         $choice = $this->choice(
             'Choose one option',
             [
@@ -207,7 +196,8 @@ class StartProcess extends Command
             $defaultIndex
         );
 
-        $this->info(sprintf('You choose %s', $choice));
+        $this->clearScreen();
+//        $this->info(sprintf('You choose %s', $choice));
 
         return $choice;
     }
