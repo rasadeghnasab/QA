@@ -5,6 +5,8 @@ namespace App\StateMachines\Machines\QA\States;
 use App\StateMachines\Interfaces\StateInterface;
 use App\StateMachines\Machines\QA\QAStatesEnum;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class Practice implements StateInterface
 {
@@ -66,7 +68,7 @@ class Practice implements StateInterface
 
         $question = $notCorrectPractices->where('body', $selected)->first();
 
-        $userAnswer = $command->ask($question->body);
+        $userAnswer = $this->getInputs($command, $question->body);
 
         if ($question->answer === $userAnswer) {
             $status = 'Correct';
@@ -78,5 +80,43 @@ class Practice implements StateInterface
 
         $question->status = $status;
         $question->save();
+    }
+
+    private function getInputs(Command $command, string $questionBody): string
+    {
+        $answer = '';
+
+        do {
+            try {
+                $valid = true;
+                $answer = $command->ask($questionBody);
+
+                $this->validate(['answer' => $answer]);
+            } catch (ValidationException $validationException) {
+                foreach (collect($validationException->errors())->flatten() as $error) {
+                    $command->warn($error);
+                }
+                $valid = false;
+            }
+        } while (!$valid);
+
+        return $answer;
+    }
+
+    /**
+     * @param array $data
+     * @throws ValidationException
+     */
+    private function validate(array $data)
+    {
+        $rules = [
+            'answer' => ['required', 'min:2', 'max:300'],
+        ];
+
+        $validator = Validator::make($data, $rules);
+
+        if ($validator->fails()) {
+            throw new ValidationException($validator);
+        }
     }
 }
