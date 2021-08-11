@@ -30,7 +30,12 @@ class StateMachine implements MachineInterface
         $this->transitions[] = $transition;
     }
 
-    public function next(string $action): StateInterface|Exception
+    /**
+     * @param string $action
+     * @return StateInterface
+     * @throws Exception
+     */
+    public function next(string $action): StateInterface
     {
         foreach ($this->transitions as $transition) {
             if ($destination = $transition->destination($this->currentState, $action)) {
@@ -43,7 +48,7 @@ class StateMachine implements MachineInterface
         );
     }
 
-    public function start(Command $command)
+    public function start(Command $command): void
     {
         $action = $this->currentState->action();
 
