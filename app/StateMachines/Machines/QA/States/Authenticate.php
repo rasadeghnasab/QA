@@ -55,20 +55,6 @@ class Authenticate implements StateInterface
         return QAStatesEnum::Authenticate;
     }
 
-    public function withPassword(): self
-    {
-        $this->withPassword = true;
-
-        return $this;
-    }
-
-    public function fullCredentials(): self
-    {
-        $this->withPassword = false;
-
-        return $this;
-    }
-
     /**
      * @param array $data
      * @throws ValidationException
@@ -90,7 +76,7 @@ class Authenticate implements StateInterface
         }
     }
 
-    private function getInputs(Command $command): array
+    private function getInputs(): array
     {
         $question = "Enter your email address\n If the email doesn't exist it will be created";
         $email = $this->command->ask($question, 'test@test.com');
