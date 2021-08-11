@@ -107,7 +107,7 @@ class Practice implements StateInterface
      * @param array $data
      * @throws ValidationException
      */
-    private function validate(array $data)
+    private function validate(array $data): void
     {
         $rules = [
             'answer' => ['required', 'min:2', 'max:300'],

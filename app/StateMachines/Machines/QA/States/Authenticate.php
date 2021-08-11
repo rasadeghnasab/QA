@@ -66,7 +66,7 @@ class Authenticate implements StateInterface
      * @param array $data
      * @throws ValidationException
      */
-    private function validate(array $data)
+    private function validate(array $data): void
     {
         $rules = [
             'email' => ['required', 'email'],
