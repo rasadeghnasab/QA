@@ -25,6 +25,11 @@ class QACommand extends Command
 
     private User $user;
 
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function user(): User
     {
         return $this->user;

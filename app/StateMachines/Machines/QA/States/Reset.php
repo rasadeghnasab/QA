@@ -11,7 +11,7 @@ class Reset implements StateInterface
     public function handle(Command $command): string
     {
         if (!$command->confirm('Are you sure? (You can not undo this action')) {
-            return false;
+            return QAStatesEnum::MainMenu;
         }
 
         $command->user()->questions()->update(['status' => 'Not answered']);
