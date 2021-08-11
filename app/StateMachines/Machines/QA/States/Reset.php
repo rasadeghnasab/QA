@@ -8,14 +8,21 @@ use Illuminate\Console\Command;
 
 class Reset implements StateInterface
 {
-    public function handle(Command $command): string
+    private Command $command;
+
+    public function __construct(Command $command)
     {
-        if (!$command->confirm('Are you sure? (You can not undo this action')) {
+        $this->command = $command;
+    }
+
+    public function handle(): string
+    {
+        if (!$this->command->confirm('Are you sure? (You can not undo this action')) {
             return QAStatesEnum::MainMenu;
         }
 
-        $command->user()->questions()->update(['status' => 'Not answered']);
-        $command->warn('Your questions are marked as `Not answered`.');
+        $this->command->user()->questions()->update(['status' => 'Not answered']);
+        $this->command->warn('Your questions are marked as `Not answered`.');
 
         return QAStatesEnum::MainMenu;
     }

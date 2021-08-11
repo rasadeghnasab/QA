@@ -24,6 +24,10 @@ class QAMachine implements MachineInterface
      * @var MachineInterface
      */
     private MachineInterface $machine;
+    /**
+     * @var Command
+     */
+    private Command $command;
 
     public function __construct(MachineInterface $machine)
     {
@@ -32,6 +36,8 @@ class QAMachine implements MachineInterface
 
     public function start(Command $command): int
     {
+        $this->command = $command;
+
         $this->make();
 
         return $this->machine->start($command);
@@ -61,8 +67,8 @@ class QAMachine implements MachineInterface
      */
     private function make(): void
     {
-        $this->setInitialState((new Authenticate())->onlyEmail());
-        $this->setExitState(new ExitApp);
+        $this->setInitialState(new Authenticate($this->command));
+        $this->setExitState(new ExitApp($this->command));
 
         foreach ($this->transitions() as $transition) {
             $this->addTransition($transition);
@@ -75,14 +81,14 @@ class QAMachine implements MachineInterface
          * if you remove the onlyEmail it will prompt for email and password
          * but now authentication system only ask for the password
          */
-        $authentication = (new Authenticate())->onlyEmail();
-        $mainMenu = new MainMenu();
-        $addQuestion = new AddQuestion();
-        $listQuestions = new ListQuestions();
-        $practice = new Practice();
-        $stats = new Stats();
-        $reset = new Reset();
-        $exit = new ExitApp();
+        $authentication = new Authenticate($this->command);
+        $mainMenu = new MainMenu($this->command);
+        $addQuestion = new AddQuestion($this->command);
+        $listQuestions = new ListQuestions($this->command);
+        $practice = new Practice($this->command);
+        $stats = new Stats($this->command);
+        $reset = new Reset($this->command);
+        $exit = new ExitApp($this->command);
 
         return [
             // authentication

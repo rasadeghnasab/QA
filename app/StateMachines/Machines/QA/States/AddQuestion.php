@@ -11,23 +11,30 @@ use Illuminate\Validation\ValidationException;
 
 class AddQuestion implements StateInterface
 {
-    public function handle(Command $command): string
+    private Command $command;
+
+    public function __construct(Command $command)
     {
-        $body = $command->ask('Enter your question body please');
-        $answer = $command->ask('Enter the answer for your question');
+        $this->command = $command;
+    }
+
+    public function handle(): string
+    {
+        $body = $this->command->ask('Enter your question body please');
+        $answer = $this->command->ask('Enter the answer for your question');
 
         $this->validate(['question' => $body, 'answer' => $answer]);
 
-        $command->user()->questions()->save(
+        $this->command->user()->questions()->save(
             new Question([
                 'body' => $body,
                 'answer' => $answer,
             ])
         );
 
-        $command->info('The question has been added successfully.');
+        $this->command->info('The question has been added successfully.');
 
-        return $command->confirm('Add another one?', true) ? QAStatesEnum::AddQuestion : QAStatesEnum::MainMenu;
+        return $this->command->confirm('Add another one?', true) ? QAStatesEnum::AddQuestion : QAStatesEnum::MainMenu;
     }
 
     public function name(): string

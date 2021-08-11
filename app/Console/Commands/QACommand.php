@@ -14,7 +14,7 @@ class QACommand extends Command
      *
      * @var string
      */
-    protected $signature = 'qanda:interactive';
+    protected $signature = 'qanda:interactive {--with-password}';
 
     /**
      * The console command description.

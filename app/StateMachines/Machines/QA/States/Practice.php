@@ -10,15 +10,22 @@ use Illuminate\Validation\ValidationException;
 
 class Practice implements StateInterface
 {
-    public function handle(Command $command): string
+    private Command $command;
+
+    public function __construct(Command $command)
     {
-        $practices = $command->user()->questions()->get(['id', 'body', 'status', 'answer']);
+        $this->command = $command;
+    }
 
-        $this->drawProgressTable($practices, $command);
+    public function handle(): string
+    {
+        $practices = $this->command->user()->questions()->get(['id', 'body', 'status', 'answer']);
 
-        $this->askQuestion($practices, $command);
+        $this->drawProgressTable($practices);
 
-        return $command->confirm('Continue?', true) ? QAStatesEnum::Practice : QAStatesEnum::MainMenu;
+        $this->askQuestion($practices);
+
+        return $this->command->confirm('Continue?', true) ? QAStatesEnum::Practice : QAStatesEnum::MainMenu;
     }
 
     public function name(): string
@@ -33,15 +40,14 @@ class Practice implements StateInterface
 
     /**
      * @param $practices
-     * @param Command $command
      */
-    private function drawProgressTable($practices, Command $command): void
+    private function drawProgressTable($practices): void
     {
         $correct = $practices->where('status', 'Correct');
 
         $completion = sprintf('%%%d answered correctly', number_format($correct->count() * 100 / $practices->count()));
 
-        $command->titledTable(
+        $this->command->titledTable(
             ['ID', 'Question', 'Status'],
             $practices->map(function ($question) {
                 return $question->only(['id', 'body', 'status']);
@@ -53,48 +59,47 @@ class Practice implements StateInterface
 
     /**
      * @param $practices
-     * @param Command $command
      * @return void
      */
-    private function askQuestion($practices, Command $command): void
+    private function askQuestion($practices): void
     {
         $notCorrectPractices = $practices->where('status', '!=', 'Correct');
         $firstNotCorrect = $notCorrectPractices->first();
 
-        $selected = $command->choice('Choose one of the questions above',
+        $selected = $this->command->choice('Choose one of the questions above',
             $notCorrectPractices->pluck('body', 'id')->toArray(),
             $firstNotCorrect->id,
         );
 
         $question = $notCorrectPractices->where('body', $selected)->first();
 
-        $userAnswer = $this->getInputs($command, $question->body);
+        $userAnswer = $this->getInputs($question->body);
 
         if ($question->answer === $userAnswer) {
             $status = 'Correct';
-            $command->info($status);
+            $this->command->info($status);
         } else {
             $status = 'Incorrect';
-            $command->error($status);
+            $this->command->error($status);
         }
 
         $question->status = $status;
         $question->save();
     }
 
-    private function getInputs(Command $command, string $questionBody): string
+    private function getInputs(string $questionBody): string
     {
         $answer = '';
 
         do {
             try {
                 $valid = true;
-                $answer = $command->ask($questionBody);
+                $answer = $this->command->ask($questionBody);
 
                 $this->validate(['answer' => $answer]);
             } catch (ValidationException $validationException) {
                 foreach (collect($validationException->errors())->flatten() as $error) {
-                    $command->warn($error);
+                    $this->command->warn($error);
                 }
                 $valid = false;
             }

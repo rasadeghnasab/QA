@@ -8,9 +8,16 @@ use Illuminate\Console\Command;
 
 class Stats implements StateInterface
 {
-    public function handle(Command $command): string
+    private Command $command;
+
+    public function __construct(Command $command)
     {
-        $questions = $command->user()->questions()->get();
+        $this->command = $command;
+    }
+
+    public function handle(): string
+    {
+        $questions = $this->command->user()->questions()->get();
 
         $answered = $correct = 0;
         if ($all = $questions->count()) {
@@ -21,14 +28,14 @@ class Stats implements StateInterface
             $correct = number_format($correct * 100 / $all);
         }
 
-        $command->titledTable(['Title', 'Value'], [
+        $this->command->titledTable(['Title', 'Value'], [
             ['Total', $all],
             ['Answered', sprintf('%%%s', $answered)],
             ['Correct', sprintf('%%%s', $correct)]
         ],
             'Stats'
         );
-        $command->newLine();
+        $this->command->newLine();
 
         return QAStatesEnum::MainMenu;
     }
