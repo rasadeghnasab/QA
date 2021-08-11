@@ -18,9 +18,9 @@ class Transition implements TransitionInterface
         $this->destination = $destination;
     }
 
-    public function destination(StateInterface $current, string $action): StateInterface|bool
+    public function destination(StateInterface $currentState, string $action): StateInterface|bool
     {
-        if ($this->source->getName() === $current->getName() && $this->action === $action) {
+        if ($this->source->getName() === $currentState->getName() && $this->action === $action) {
             return $this->destination;
         }
 

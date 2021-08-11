@@ -2,7 +2,6 @@
 
 namespace App\StateMachines;
 
-use Carbon\Laravel\ServiceProvider;
 use Exception;
 use App\StateMachines\Interfaces\MachineInterface;
 use App\StateMachines\Interfaces\StateInterface;
@@ -45,6 +44,7 @@ class StateMachine implements MachineInterface
                 $action = $state->handle($command);
             } catch (Exception $exception) {
                 $command->error($exception->getMessage());
+                $action = 'Exit';
                 exit(255);
             }
         }
