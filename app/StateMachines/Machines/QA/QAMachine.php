@@ -49,7 +49,7 @@ class QAMachine
         }
     }
 
-    private function setSpecialStates()
+    private function setSpecialStates(): void
     {
         $authentication = (new Authenticate())->onlyEmail();
         $exit = new ExitApp();
@@ -59,7 +59,7 @@ class QAMachine
         $this->machine->setExitState($exit);
     }
 
-    private function transitions()
+    private function transitions(): array
     {
         /**
          * if you remove the onlyEmail it will prompt for email and password
