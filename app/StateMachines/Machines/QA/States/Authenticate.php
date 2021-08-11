@@ -1,9 +1,10 @@
 <?php
 
-namespace App\StateMachines\States;
+namespace App\StateMachines\Machines\QA\States;
 
 use App\Models\User;
 use App\StateMachines\Interfaces\StateInterface;
+use App\StateMachines\Machines\QA\QAStatesEnum;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;
 
@@ -14,7 +15,8 @@ class Authenticate implements StateInterface
     public function handle(Command $command): string
     {
         $question = "Enter your email address\n If the email doesn't exist it will be created";
-        $email = $command->ask($question, 'test@test.com');
+//        $email = $command->ask($question, 'test@test.com');
+        $email = $command->ask($question, 'ramin@tramin.com');
         $user = User::where('email', $email)->first() ?? User::factory()->create(['email' => $email, 'name' => $email]);
         $authenticated = true;
 
@@ -24,20 +26,26 @@ class Authenticate implements StateInterface
         }
 
         if ($authenticated) {
-            $command->info('You logged in successfully');
+            $command->info(' You logged in successfully');
+            $command->newLine();
             $command->setUser($user);
 
-            return 'MainMenu';
+            return QAStatesEnum::MainMenu;
         }
 
         $command->error('Authentication failed. Please try again.');
 
-        return 'Authenticate';
+        return QAStatesEnum::Authenticate;
     }
 
     public function name(): string
     {
         return self::class;
+    }
+
+    public function action(): string
+    {
+        return QAStatesEnum::Authenticate;
     }
 
     public function onlyEmail(): self

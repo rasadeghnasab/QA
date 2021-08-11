@@ -1,8 +1,9 @@
 <?php
 
-namespace App\StateMachines\States;
+namespace App\StateMachines\Machines\QA\States;
 
 use App\StateMachines\Interfaces\StateInterface;
+use App\StateMachines\Machines\QA\QAStatesEnum;
 use Illuminate\Console\Command;
 
 class Practice implements StateInterface
@@ -15,12 +16,17 @@ class Practice implements StateInterface
 
         $this->askQuestion($practices, $command);
 
-        return $command->confirm('Continue?', true) ? 'Practice' : 'MainMenu';
+        return $command->confirm('Continue?', true) ? QAStatesEnum::Practice : QAStatesEnum::MainMenu;
     }
 
     public function name(): string
     {
         return self::class;
+    }
+
+    public function action(): string
+    {
+        return QAStatesEnum::Practice;
     }
 
     /**

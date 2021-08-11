@@ -1,8 +1,9 @@
 <?php
 
-namespace App\StateMachines\States;
+namespace App\StateMachines\Machines\QA\States;
 
 use App\StateMachines\Interfaces\StateInterface;
+use App\StateMachines\Machines\QA\QAStatesEnum;
 use Illuminate\Console\Command;
 
 class Stats implements StateInterface
@@ -12,7 +13,7 @@ class Stats implements StateInterface
         $questions = $command->user()->questions()->get();
 
         $all = $questions->count();
-        $answered = $questions->where('status', 'Incorrect')->count();
+        $answered = $questions->whereIn('status', ['Correct', 'Incorrect'])->count();
         $correct = $questions->where('status', 'Correct')->count();
 
         $command->titledTable(['Header', 'Value'], [
@@ -24,11 +25,16 @@ class Stats implements StateInterface
         );
         $command->newLine();
 
-        return 'MainMenu';
+        return QAStatesEnum::MainMenu;
     }
 
     public function name(): string
     {
         return self::class;
+    }
+
+    public function action(): string
+    {
+        return QAStatesEnum::Stats;
     }
 }

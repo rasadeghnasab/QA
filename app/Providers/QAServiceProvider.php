@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\StateMachines\Machines\QAMachine;
+use App\StateMachines\Machines\QA\QAMachine;
 use App\StateMachines\StateMachine;
 use Illuminate\Support\ServiceProvider;
 

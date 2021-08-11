@@ -11,9 +11,9 @@ class Transition implements TransitionInterface
     private StateInterface $source;
     private StateInterface $destination;
 
-    public function __construct(string $action, StateInterface $source, StateInterface $destination)
+    public function __construct(StateInterface $source, StateInterface $destination, string $action = null)
     {
-        $this->action = $action;
+        $this->action = $action ?? $destination->action();
         $this->source = $source;
         $this->destination = $destination;
     }
