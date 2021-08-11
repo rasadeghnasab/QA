@@ -34,6 +34,8 @@ class QAMachine implements MachineInterface
     {
         $this->make();
 
+        $this->drawLogo($command);
+
         return $this->machine->start($command);
     }
 
@@ -113,5 +115,21 @@ class QAMachine implements MachineInterface
             new Transition($stats, $mainMenu),
             new Transition($reset, $mainMenu),
         ];
+    }
+
+    private function drawLogo(Command $command): void
+    {
+        $asciLogo = <<<EOT
+<fg=bright-blue>
+   ____                    _
+  / __ \                  | |     /\
+ | |  | |   __ _ _ __   __| |    /  \
+ | |  | |  / _` | '_ \ / _` |   / /\ \
+ | |__| | | (_| | | | | (_| |  / ____ \
+  \___\_\  \__,_|_| |_|\__,_| /_/    \_\
+</>
+EOT;
+
+        $command->line("\n{$asciLogo}\n");
     }
 }
