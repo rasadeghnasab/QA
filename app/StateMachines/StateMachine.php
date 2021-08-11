@@ -12,10 +12,16 @@ class StateMachine implements MachineInterface
 {
     private array $transitions = [];
     private StateInterface $currentState;
+    private StateInterface $exitState;
 
     public function setInitialState(StateInterface $state): void
     {
         $this->currentState = $state;
+    }
+
+    public function setExitState(StateInterface $state): void
+    {
+        $this->exitState = $state;
     }
 
     public function addTransition(TransitionInterface $transition): void
@@ -31,20 +37,27 @@ class StateMachine implements MachineInterface
             }
         }
 
-        throw new Exception('This state has no path to anywhere.');
+        throw new Exception(
+            sprintf('No path defined to any state from `%s` with the action `%s`', $this->currentState->name(), $action)
+        );
     }
 
     public function start(Command $command)
     {
         $action = $this->currentState->handle($command);
-        while ($action !== 'Exit') {
+
+        while ($this->exitState->name() != $this->currentState->name()) {
             try {
                 $state = $this->next($action);
                 $this->currentState = $state;
                 $action = $state->handle($command);
             } catch (Exception $exception) {
-                $command->error($exception->getMessage());
-                $action = 'Exit';
+//                $command->error(sprintf("Exiting...\n%s", $exception->getMessage()));
+                $command->error("Exiting...");
+                $command->newLine();
+                $command->error(sprintf('Error message: %s', $exception->getMessage()));
+
+                $this->currentState = $this->exitState;
                 exit(255);
             }
         }

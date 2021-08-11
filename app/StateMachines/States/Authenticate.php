@@ -13,18 +13,20 @@ class Authenticate implements StateInterface
 
     public function handle(Command $command): string
     {
-        $email = $command->ask('Enter your email address', 'test@test.com');
-        $user = User::where('email', $email)->first();
-        $isValid = true;
+        $question = "Enter your email address\n If the email doesn't exist it will be created";
+        $email = $command->ask($question, 'test@test.com');
+        $user = User::where('email', $email)->first() ?? User::factory()->create(['email' => $email, 'name' => $email]);
+        $authenticated = true;
 
         if (!$this->onlyEmail) {
             $password = $command->secret('Enter your password');
-            $isValid = Hash::check($password, $user->getAuthPassword());
+            $authenticated = Hash::check($password, $user->getAuthPassword());
         }
 
-        if ($isValid) {
+        if ($authenticated) {
             $command->info('You logged in successfully');
             $command->setUser($user);
+
             return 'MainMenu';
         }
 
