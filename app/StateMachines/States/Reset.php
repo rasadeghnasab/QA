@@ -19,7 +19,7 @@ class Reset implements StateInterface
         return 'MainMenu';
     }
 
-    public function getName(): string
+    public function name(): string
     {
         return self::class;
     }
