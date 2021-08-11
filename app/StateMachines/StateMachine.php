@@ -7,6 +7,7 @@ use App\StateMachines\Interfaces\MachineInterface;
 use App\StateMachines\Interfaces\StateInterface;
 use App\StateMachines\Interfaces\TransitionInterface;
 use Illuminate\Console\Command;
+use Illuminate\Validation\ValidationException;
 
 class StateMachine implements MachineInterface
 {
@@ -44,15 +45,17 @@ class StateMachine implements MachineInterface
 
     public function start(Command $command)
     {
-        $action = $this->currentState->handle($command);
+        $action = $this->currentState->action();
 
-        while ($this->exitState->name() != $this->currentState->name()) {
+        do {
             try {
-                $state = $this->next($action);
-                $this->currentState = $state;
-                $action = $state->handle($command);
+                $this->currentState = $this->next($action);
+                $action = $this->currentState->handle($command);
+            } catch (ValidationException $validationException) {
+                foreach (collect($validationException->errors())->flatten() as $error) {
+                    $command->warn($error);
+                }
             } catch (Exception $exception) {
-//                $command->error(sprintf("Exiting...\n%s", $exception->getMessage()));
                 $command->error("Exiting...");
                 $command->newLine();
                 $command->error(sprintf('Error message: %s', $exception->getMessage()));
@@ -60,6 +63,6 @@ class StateMachine implements MachineInterface
                 $this->currentState = $this->exitState;
                 exit(255);
             }
-        }
+        } while ($this->exitState->action() !== $this->currentState->action());
     }
 }

@@ -1,26 +1,20 @@
 <?php
 
-namespace App\StateMachines\States;
+namespace App\StateMachines\Machines\QA\States;
 
 use App\StateMachines\Interfaces\StateInterface;
+use App\StateMachines\Machines\QA\QAStatesEnum;
 use Illuminate\Console\Command;
 
 class MainMenu implements StateInterface
 {
     public function handle(Command $command): string
     {
-        $defaultIndex = 0;
+        $command->info(sprintf(' User: %s', $command->user()->email));
         $choice = $command->choice(
             'Choose one option',
-            [
-                'Create a question',
-                'List questions',
-                'Practice',
-                'Stats',
-                'Reset',
-                'Exit'
-            ],
-            $defaultIndex
+            QAStatesEnum::mainMenu(),
+            $defaultIndex = 0
         );
 
         $this->clearScreen();
@@ -31,6 +25,11 @@ class MainMenu implements StateInterface
     public function name(): string
     {
         return self::class;
+    }
+
+    public function action(): string
+    {
+        return QAStatesEnum::MainMenu;
     }
 
     private function clearScreen()
