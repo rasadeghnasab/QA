@@ -61,17 +61,12 @@ class QAMachine implements MachineInterface
      */
     private function make(): void
     {
-        $this->setSpecialStates();
+        $this->setInitialState((new Authenticate())->onlyEmail());
+        $this->setExitState(new ExitApp);
 
         foreach ($this->transitions() as $transition) {
             $this->addTransition($transition);
         }
-    }
-
-    private function setSpecialStates(): void
-    {
-        $this->setInitialState((new Authenticate())->onlyEmail());
-        $this->setExitState(new ExitApp);
     }
 
     private function transitions(): array
