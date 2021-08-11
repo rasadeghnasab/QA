@@ -11,9 +11,29 @@ class Practice implements StateInterface
     {
         $practices = $command->user()->questions()->get(['id', 'body', 'status', 'answer']);
 
+        $this->drawProgressTable($practices, $command);
+
+        $this->askQuestion($practices, $command);
+
+        $command->newLine(1);
+
+        return $command->confirm('Continue?', true) ? 'Practice' : 'MainMenu';
+    }
+
+    public function getName(): string
+    {
+        return self::class;
+    }
+
+    /**
+     * @param $practices
+     * @param Command $command
+     */
+    private function drawProgressTable($practices, Command $command): void
+    {
         $correct = $practices->where('status', 'Correct');
 
-        $completion = sprintf('%%%d', number_format($correct->count() * 100 / $practices->count()));
+        $completion = sprintf('%%%d answered correctly', number_format($correct->count() * 100 / $practices->count()));
 
         $command->titledTable(
             ['ID', 'Question', 'Status'],
@@ -23,12 +43,19 @@ class Practice implements StateInterface
             'Practices',
             $completion
         );
+    }
 
+    /**
+     * @param $practices
+     * @param Command $command
+     * @return void
+     */
+    private function askQuestion($practices, Command $command): void
+    {
         $notCorrectPractices = $practices->where('status', '!=', 'Correct');
         $firstNotCorrect = $notCorrectPractices->first();
 
-
-        $selected = $command->choice('Choose one of the question above',
+        $selected = $command->choice('Choose one of the questions above',
             $notCorrectPractices->pluck('body', 'id')->toArray(),
             $firstNotCorrect->id,
         );
@@ -39,22 +66,13 @@ class Practice implements StateInterface
 
         $status = 'Correct';
         if ($question->answer === $userAnswer) {
+            $question->status = 'Correct';
             $command->info($status);
         } else {
-            $status = 'Incorrect';
+            $question->status = 'Incorrect';
             $command->error($status);
         }
 
-        $question->status = $status;
         $question->save();
-
-        $command->newLine(2);
-
-        return $command->confirm('Continue?', true) ? 'Practice' : 'MainMenu';
-    }
-
-    public function getName(): string
-    {
-        return self::class;
     }
 }
