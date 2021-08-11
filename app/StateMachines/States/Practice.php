@@ -15,8 +15,6 @@ class Practice implements StateInterface
 
         $this->askQuestion($practices, $command);
 
-        $command->newLine(1);
-
         return $command->confirm('Continue?', true) ? 'Practice' : 'MainMenu';
     }
 
@@ -64,15 +62,15 @@ class Practice implements StateInterface
 
         $userAnswer = $command->ask($question->body);
 
-        $status = 'Correct';
         if ($question->answer === $userAnswer) {
-            $question->status = 'Correct';
+            $status = 'Correct';
             $command->info($status);
         } else {
-            $question->status = 'Incorrect';
+            $status = 'Incorrect';
             $command->error($status);
         }
 
+        $question->status = $status;
         $question->save();
     }
 }
