@@ -12,5 +12,5 @@ interface MachineInterface
 
     public function addTransition(TransitionInterface $transition): void;
 
-    public function start(Command $command);
+    public function start(Command $command): int;
 }

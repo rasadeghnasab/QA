@@ -2,6 +2,8 @@
 
 namespace App\StateMachines\Machines\QA;
 
+use App\StateMachines\Interfaces\StateInterface;
+use App\StateMachines\Interfaces\TransitionInterface;
 use App\StateMachines\Transition;
 use Illuminate\Console\Command;
 use App\StateMachines\Interfaces\MachineInterface;
@@ -16,7 +18,7 @@ use App\StateMachines\Machines\QA\States\{
     Stats,
 };
 
-class QAMachine
+class QAMachine implements MachineInterface
 {
     /**
      * @var MachineInterface
@@ -28,10 +30,27 @@ class QAMachine
         $this->machine = $machine;
     }
 
-    public function start(Command $command)
+    public function start(Command $command): int
     {
         $this->make();
-        $this->machine->start($command);
+
+        return $this->machine->start($command);
+    }
+
+    public function setInitialState(StateInterface $state): void
+    {
+        // we can set the initial state to mainMenu and bypass the authentication step
+        $this->machine->setInitialState($state);
+    }
+
+    public function setExitState(StateInterface $state): void
+    {
+        $this->machine->setExitState($state);
+    }
+
+    public function addTransition(TransitionInterface $transition): void
+    {
+        $this->machine->addTransition($transition);
     }
 
     /**
@@ -45,18 +64,14 @@ class QAMachine
         $this->setSpecialStates();
 
         foreach ($this->transitions() as $transition) {
-            $this->machine->addTransition($transition);
+            $this->addTransition($transition);
         }
     }
 
     private function setSpecialStates(): void
     {
-        $authentication = (new Authenticate())->onlyEmail();
-        $exit = new ExitApp();
-
-        // we can set the initial state to mainMenu and bypass the authentication step
-        $this->machine->setInitialState($authentication);
-        $this->machine->setExitState($exit);
+        $this->setInitialState((new Authenticate())->onlyEmail());
+        $this->setExitState(new ExitApp);
     }
 
     private function transitions(): array

@@ -48,7 +48,7 @@ class QACommand extends Command
     {
         $machine = app()->make('QAStateMachine');
 
-        $machine->start($this);
+        return $machine->start($this);
     }
 
     /**

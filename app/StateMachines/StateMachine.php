@@ -48,7 +48,7 @@ class StateMachine implements MachineInterface
         );
     }
 
-    public function start(Command $command): void
+    public function start(Command $command): int
     {
         $action = $this->currentState->action();
 
@@ -66,8 +66,11 @@ class StateMachine implements MachineInterface
                 $command->error(sprintf('Error message: %s', $exception->getMessage()));
 
                 $this->currentState = $this->exitState;
-                exit(255);
+
+                return 255;
             }
         } while ($this->exitState->action() !== $this->currentState->action());
+
+        return 0;
     }
 }

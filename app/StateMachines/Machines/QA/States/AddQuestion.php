@@ -16,7 +16,7 @@ class AddQuestion implements StateInterface
         $body = $command->ask('Enter your question body please');
         $answer = $command->ask('Enter the answer for your question');
 
-        $this->validate(['body' => $body, 'answer' => $answer]);
+        $this->validate(['question' => $body, 'answer' => $answer]);
 
         $command->user()->questions()->save(
             new Question([
