@@ -15,8 +15,7 @@ class Authenticate implements StateInterface
     public function handle(Command $command): string
     {
         $question = "Enter your email address\n If the email doesn't exist it will be created";
-//        $email = $command->ask($question, 'test@test.com');
-        $email = $command->ask($question, 'ramin@tramin.com');
+        $email = $command->ask($question, 'test@test.com');
         $user = User::where('email', $email)->first() ?? User::factory()->create(['email' => $email, 'name' => $email]);
         $authenticated = true;
 
