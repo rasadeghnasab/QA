@@ -8,17 +8,24 @@ use Illuminate\Console\Command;
 
 class ListQuestions implements StateInterface
 {
-    public function handle(Command $command): string
+    private Command $command;
+
+    public function __construct(Command $command)
     {
-        $questions = $command->user()->questions()->get(['id', 'body'])->toArray();
+        $this->command = $command;
+    }
+
+    public function handle(): string
+    {
+        $questions = $this->command->user()->questions()->get(['id', 'body'])->toArray();
 
         if (empty($questions)) {
-            $command->warn(' You do not have any question!');
+            $this->command->warn(' You do not have any question!');
 
             return QAStatesEnum::MainMenu;
         }
 
-        $command->titledTable(
+        $this->command->titledTable(
             ['ID', 'Question'],
             $questions,
             'Questions',

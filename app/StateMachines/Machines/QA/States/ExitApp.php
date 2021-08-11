@@ -8,9 +8,16 @@ use Illuminate\Console\Command;
 
 class ExitApp implements StateInterface
 {
-    public function handle(Command $command): string
+    private Command $command;
+
+    public function __construct(Command $command)
     {
-        $command->info(sprintf('Goodbye `%s`.', $command->user()->name));
+        $this->command = $command;
+    }
+
+    public function handle(): string
+    {
+        $this->command->info(sprintf('Goodbye `%s`.', $this->command->user()->name));
 
         return QAStatesEnum::Exit;
     }

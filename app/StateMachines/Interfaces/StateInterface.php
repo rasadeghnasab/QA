@@ -6,7 +6,9 @@ use Illuminate\Console\Command;
 
 interface StateInterface
 {
-    public function handle(Command $command): string;
+    public function __construct(Command $command);
+
+    public function handle(): string;
 
     public function name(): string;
 

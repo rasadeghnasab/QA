@@ -8,10 +8,17 @@ use Illuminate\Console\Command;
 
 class MainMenu implements StateInterface
 {
-    public function handle(Command $command): string
+    private Command $command;
+
+    public function __construct(Command $command)
     {
-        $command->info(sprintf(' User: %s', $command->user()->email));
-        $choice = $command->choice(
+        $this->command = $command;
+    }
+
+    public function handle(): string
+    {
+        $this->command->info(sprintf(' User: %s', $this->command->user()->email));
+        $choice = $this->command->choice(
             'Choose one option',
             QAStatesEnum::mainMenu(),
             $defaultIndex = 0

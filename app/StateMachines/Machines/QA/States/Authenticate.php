@@ -12,28 +12,35 @@ use Illuminate\Validation\ValidationException;
 
 class Authenticate implements StateInterface
 {
-    private bool $onlyEmail = false;
+    private bool $withPassword;
+    private Command $command;
 
-    public function handle(Command $command): string
+    public function __construct(Command $command)
     {
-        list($email, $password) = $this->getInputs($command);
+        $this->command = $command;
+        $this->withPassword = (bool)$command->option('with-password');
+    }
+
+    public function handle(): string
+    {
+        list($email, $password) = $this->getInputs($this->command);
 
         $user = User::where('email', $email)->first() ?? User::factory()->create(['email' => $email, 'name' => $email]);
         $authenticated = true;
 
-        if (!$this->onlyEmail) {
+        if ($this->withPassword) {
             $authenticated = Hash::check($password, $user->getAuthPassword());
         }
 
         if ($authenticated) {
-            $command->info(' You logged in successfully');
-            $command->newLine();
-            $command->setUser($user);
+            $this->command->info(' You logged in successfully');
+            $this->command->newLine();
+            $this->command->setUser($user);
 
             return QAStatesEnum::MainMenu;
         }
 
-        $command->error('Authentication failed. Please try again.');
+        $this->command->error('Authentication failed. Please try again.');
 
         return QAStatesEnum::Authenticate;
     }
@@ -46,20 +53,6 @@ class Authenticate implements StateInterface
     public function action(): string
     {
         return QAStatesEnum::Authenticate;
-    }
-
-    public function onlyEmail(): self
-    {
-        $this->onlyEmail = true;
-
-        return $this;
-    }
-
-    public function fullCredentials(): self
-    {
-        $this->onlyEmail = false;
-
-        return $this;
     }
 
     /**
@@ -83,15 +76,15 @@ class Authenticate implements StateInterface
         }
     }
 
-    private function getInputs(Command $command): array
+    private function getInputs(): array
     {
         $question = "Enter your email address\n If the email doesn't exist it will be created";
-        $email = $command->ask($question, 'test@test.com');
+        $email = $this->command->ask($question, 'test@test.com');
         $data = ['email' => $email];
 
         $password = '';
-        if (!$this->onlyEmail) {
-            $password = $command->secret('Enter your password');
+        if ($this->withPassword) {
+            $password = $this->command->secret('Enter your password');
             $data['password'] = $password;
         }
 
