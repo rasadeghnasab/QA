@@ -49,6 +49,7 @@ class QAMachine
 
         // we can set the initial state to mainMenu and bypass the authentication step
         $this->machine->setInitialState($authentication);
+        $this->machine->setExitState($exit);
 
         // authentication
         $this->machine->addTransition(new Transition('Authenticate', $authentication, $authentication));
