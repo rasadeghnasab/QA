@@ -33,7 +33,7 @@ class Authenticate implements StateInterface
         return 'Authenticate';
     }
 
-    public function getName(): string
+    public function name(): string
     {
         return self::class;
     }

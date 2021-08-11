@@ -20,7 +20,7 @@ class Practice implements StateInterface
         return $command->confirm('Continue?', true) ? 'Practice' : 'MainMenu';
     }
 
-    public function getName(): string
+    public function name(): string
     {
         return self::class;
     }

@@ -26,7 +26,7 @@ class AddQuestion implements StateInterface
         return $command->confirm('Add another one?', true) ? 'Create a question' : 'MainMenu';
     }
 
-    public function getName(): string
+    public function name(): string
     {
         return self::class;
     }

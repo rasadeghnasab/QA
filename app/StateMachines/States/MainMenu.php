@@ -28,7 +28,7 @@ class MainMenu implements StateInterface
         return $choice;
     }
 
-    public function getName(): string
+    public function name(): string
     {
         return self::class;
     }

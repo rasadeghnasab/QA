@@ -14,7 +14,7 @@ class ExitApp implements StateInterface
         return 'Exit';
     }
 
-    public function getName(): string
+    public function name(): string
     {
         return self::class;
     }
