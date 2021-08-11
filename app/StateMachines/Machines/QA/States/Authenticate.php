@@ -12,12 +12,13 @@ use Illuminate\Validation\ValidationException;
 
 class Authenticate implements StateInterface
 {
-    private bool $withPassword = false;
+    private bool $withPassword;
     private Command $command;
 
     public function __construct(Command $command)
     {
         $this->command = $command;
+        $this->withPassword = (bool)$command->option('with-password');
     }
 
     public function handle(): string
@@ -96,7 +97,7 @@ class Authenticate implements StateInterface
         $data = ['email' => $email];
 
         $password = '';
-        if (!$this->withPassword) {
+        if ($this->withPassword) {
             $password = $this->command->secret('Enter your password');
             $data['password'] = $password;
         }
