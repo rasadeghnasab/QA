@@ -28,6 +28,12 @@ class QAMachine
         $this->machine = $machine;
     }
 
+    public function start(Command $command)
+    {
+        $this->make();
+        $this->machine->start($command);
+    }
+
     /**
      * NOTE:
      * We can make this method dynamic and read the values from a database
@@ -35,6 +41,25 @@ class QAMachine
      * In this way it's easier to read and understand
      */
     private function make(): void
+    {
+        $this->setSpecialStates();
+
+        foreach ($this->transitions() as $transition) {
+            $this->machine->addTransition($transition);
+        }
+    }
+
+    private function setSpecialStates()
+    {
+        $authentication = (new Authenticate())->onlyEmail();
+        $exit = new ExitApp();
+
+        // we can set the initial state to mainMenu and bypass the authentication step
+        $this->machine->setInitialState($authentication);
+        $this->machine->setExitState($exit);
+    }
+
+    private function transitions()
     {
         /**
          * if you remove the onlyEmail it will prompt for email and password
@@ -49,37 +74,29 @@ class QAMachine
         $reset = new Reset();
         $exit = new ExitApp();
 
-        // we can set the initial state to mainMenu and bypass the authentication step
-        $this->machine->setInitialState($authentication);
-        $this->machine->setExitState($exit);
+        return [
+            // authentication
+            new Transition($authentication, $authentication),
 
-        // authentication
-        $this->machine->addTransition(new Transition($authentication, $authentication));
+            // main menu
+            new Transition($mainMenu, $addQuestion),
+            new Transition($mainMenu, $listQuestions),
+            new Transition($mainMenu, $practice),
+            new Transition($mainMenu, $stats),
+            new Transition($mainMenu, $reset),
+            new Transition($mainMenu, $exit),
 
-        // main menu
-        $this->machine->addTransition(new Transition($mainMenu, $addQuestion));
-        $this->machine->addTransition(new Transition($mainMenu, $listQuestions));
-        $this->machine->addTransition(new Transition($mainMenu, $practice));
-        $this->machine->addTransition(new Transition($mainMenu, $stats));
-        $this->machine->addTransition(new Transition($mainMenu, $reset));
-        $this->machine->addTransition(new Transition($mainMenu, $exit));
+            // recursive
+            new Transition($practice, $practice),
+            new Transition($addQuestion, $addQuestion),
 
-        // recursive
-        $this->machine->addTransition(new Transition($practice, $practice));
-        $this->machine->addTransition(new Transition($addQuestion, $addQuestion));
-
-        // automatically return to the main menu
-        $this->machine->addTransition(new Transition($authentication, $mainMenu));
-        $this->machine->addTransition(new Transition($addQuestion, $mainMenu));
-        $this->machine->addTransition(new Transition($listQuestions, $mainMenu));
-        $this->machine->addTransition(new Transition($practice, $mainMenu));
-        $this->machine->addTransition(new Transition($stats, $mainMenu));
-        $this->machine->addTransition(new Transition($reset, $mainMenu));
-    }
-
-    public function start(Command $command)
-    {
-        $this->make();
-        $this->machine->start($command);
+            // automatically return to the main menu
+            new Transition($authentication, $mainMenu),
+            new Transition($addQuestion, $mainMenu),
+            new Transition($listQuestions, $mainMenu),
+            new Transition($practice, $mainMenu),
+            new Transition($stats, $mainMenu),
+            new Transition($reset, $mainMenu),
+        ];
     }
 }
