@@ -41,6 +41,8 @@ class MainMenu implements StateInterface
 
     private function clearScreen()
     {
-        system('clear');
+        if (!app()->environment('testing')) {
+            system('clear');
+        }
     }
 }

@@ -2,37 +2,18 @@
 
 namespace Tests\Feature\QACommand;
 
-use App\Models\User;
 use App\StateMachines\Machines\QA\QAStatesEnum;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Testing\PendingCommand;
-use Tests\TestCase;
+use Tests\Feature\QATestCase;
 
-class MainMenuTest extends TestCase
+class MainMenuTest extends QATestCase
 {
     use RefreshDatabase;
 
-    private PendingCommand $artisan;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->login();
-    }
-
-    private function login()
-    {
-        $this->artisan('qanda:interactive')
-            ->expectsQuestion("Enter your email address\n If the email doesn't exist it will be created", 'test@test.com');
-    }
-
     public function test_main_menu(): void
     {
-//        $this->artisan('qanda:interactive')
-//            ->expectsQuestion("Enter your email address\n If the email doesn't exist it will be created", 'test@test.com')
-//            ->expectsOutput('You logged in successfully');
-//            $this->artisan->expectsChoice('Choose one option', QAStatesEnum::Exit, QAStatesEnum::mainMenu())
-//            ->expectsOutput(sprintf('Goodbye `%s`.', 'test@test.com'));
+        $this->login()
+            ->expectsOutput("User: {$this->user->email}")
+            ->expectsChoice('Choose one option', 5, QAStatesEnum::mainMenu());
     }
 }
