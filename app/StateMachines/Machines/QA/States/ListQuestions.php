@@ -19,7 +19,7 @@ class ListQuestions implements StateInterface
 
     public function handle(): string
     {
-        $questions = $this->command->user()->questions()->get(['id', 'body'])->toArray();
+        $questions = $this->command->user()->questions()->get(['id', 'body', 'answer'])->toArray();
 
         if (empty($questions)) {
             $this->command->warn('You do not have any question!');
@@ -28,7 +28,7 @@ class ListQuestions implements StateInterface
         }
 
         $this->command->table(
-            ['ID', 'Question'],
+            ['ID', 'Question', 'Answer'],
             $questions,
         );
 

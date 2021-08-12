@@ -27,12 +27,12 @@ class ListQuestionsTest extends QATestCase
     public function test_questions_listed_as_we_expected($count)
     {
         $questions = Question::factory($count)->create(['user_id' => $this->user->id])->map(function ($question) {
-            return ['id' => $question->id, 'body' => $question->body];
+            return $question->only(['id', 'body', 'answer']);
         });
 
         $this->login()
             ->expectsChoice('Choose one option', QAStatesEnum::ListQuestions, QAStatesEnum::mainMenu())
-            ->expectsTable(['ID', 'Question'], $questions->toArray());
+            ->expectsTable(['ID', 'Question', 'Answer'], $questions->toArray());
     }
 
     public function questionsDataProvider(): array
