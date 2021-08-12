@@ -2,88 +2,46 @@
 
 namespace Tests\Feature\QACommand;
 
-use App\Models\User;
+use App\Models\Question;
 use App\StateMachines\Machines\QA\QAStatesEnum;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Feature\QATestCase;
-use Tests\TestCase;
 
 class ListQuestionsTest extends QATestCase
 {
     use RefreshDatabase;
 
-    private string $email;
-
-    public function setUp(): void
+    public function test_user_has_no_question_yet(): void
     {
-        parent::setUp();
-
-        $this->email = 'test@test.com';
-
-        User::factory()->create(['email' => $this->email]);
+        $this->login()
+            ->expectsChoice('Choose one option', QAStatesEnum::ListQuestions, QAStatesEnum::mainMenu())
+            ->expectsOutput('You do not have any question!')
+            ->expectsChoice('Choose one option', QAStatesEnum::Exit, QAStatesEnum::mainMenu());
     }
 
-    public function test_user_will_be_created_if_it_not_exists(): void
+    /**
+     * @dataProvider questionsDataProvider
+     *
+     * @param $count
+     */
+    public function test_questions_listed_as_we_expected($count)
     {
-        $email = 'not_existed@user.com';
+        $questions = Question::factory($count)->create(['user_id' => $this->user->id])->map(function ($question) {
+            return ['id' => $question->id, 'body' => $question->body];
+        });
 
-        $this->artisan('qanda:interactive')
-            ->expectsQuestion("Enter your email address\n If the email doesn't exist it will be created", $email)
-            ->expectsOutput("User: {$email}");
-
-
-        $this->assertDatabaseHas('users', [
-            'email' => $email
-        ]);
+        $this->login()
+            ->expectsChoice('Choose one option', QAStatesEnum::ListQuestions, QAStatesEnum::mainMenu())
+            ->expectsTable(['ID', 'Question'], $questions->toArray());
     }
 
-    public function test_authentication_with_no_password_required(): void
+    public function questionsDataProvider(): array
     {
-        $this->artisan('qanda:interactive')
-            ->expectsQuestion("Enter your email address\n If the email doesn't exist it will be created", $this->email)
-            ->expectsOutput('You logged in successfully')
-            ->expectsOutput("User: {$this->email}");
-    }
-
-    public function test_authentication_wrong_email_provided()
-    {
-        $this->artisan('qanda:interactive')
-            ->expectsQuestion("Enter your email address\n If the email doesn't exist it will be created", 'not_an_email')
-            ->expectsOutput('The email must be a valid email address.')
-            ->expectsQuestion("Enter your email address\n If the email doesn't exist it will be created", 'test@test.com');
-    }
-
-    public function test_authentication_no_email_provided(): void
-    {
-        $this->artisan('qanda:interactive')
-            ->expectsQuestion("Enter your email address\n If the email doesn't exist it will be created", '')
-            ->expectsOutput('The email field is required.')
-            ->expectsQuestion("Enter your email address\n If the email doesn't exist it will be created", 'test@test.com');
-    }
-
-    public function test_full_authentication_short_password_provided(): void
-    {
-        $this->artisan('qanda:interactive --with-password')
-            ->expectsQuestion("Enter your email address\n If the email doesn't exist it will be created", $this->email)
-            ->expectsQuestion("Enter your password", 'short')
-            ->expectsOutput('The password must be at least 8 characters.');
-    }
-
-    public function test_authentication_no_password_provided(): void
-    {
-        $this->artisan('qanda:interactive --with-password')
-            ->expectsQuestion("Enter your email address\n If the email doesn't exist it will be created", $this->email)
-            ->expectsQuestion("Enter your password", '')
-            ->expectsOutput('The password field is required.');
-    }
-
-    public function test_authentication_show_main_menu_after_successful_login(): void
-    {
-        $this->artisan('qanda:interactive --with-password')
-            ->expectsQuestion("Enter your email address\n If the email doesn't exist it will be created", $this->email)
-            ->expectsQuestion("Enter your password", 'password')
-            ->expectsOutput('You logged in successfully')
-            ->expectsOutput("User: {$this->email}")
-            ->expectsChoice('Choose one option', 5, QAStatesEnum::mainMenu());
+        return [
+            ['count' => 6],
+            ['count' => 1],
+            ['count' => 2],
+            ['count' => 4],
+        ];
     }
 }

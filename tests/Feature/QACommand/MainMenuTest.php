@@ -14,6 +14,6 @@ class MainMenuTest extends QATestCase
     {
         $this->login()
             ->expectsOutput("User: {$this->user->email}")
-            ->expectsChoice('Choose one option', 5, QAStatesEnum::mainMenu());
+            ->expectsChoice('Choose one option', QAStatesEnum::Exit, QAStatesEnum::mainMenu());
     }
 }

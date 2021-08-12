@@ -52,35 +52,4 @@ class QACommand extends Command
 
         return $machine->start($this, new QATransitions(new QAMap($this)));
     }
-
-    /**
-     * Format input to textual table.
-     *
-     * @param array $headers
-     * @param Arrayable|array $rows
-     * @param string $header
-     * @param string $footer
-     * @param string $tableStyle
-     * @return void
-     */
-    public function titledTable($headers, $rows, string $header = '', string $footer = '', $tableStyle = 'default')
-    {
-        $table = new Table($this->output);
-
-        if ($rows instanceof Arrayable) {
-            $rows = $rows->toArray();
-        }
-
-        $table->setHeaders((array)$headers)->setRows($rows)->setStyle($tableStyle);
-
-        if (!empty($header)) {
-            $table->setHeaderTitle($header);
-        }
-
-        if (!empty($footer)) {
-            $table->setFooterTitle($footer);
-        }
-
-        $table->render();
-    }
 }
