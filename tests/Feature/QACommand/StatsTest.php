@@ -11,14 +11,6 @@ class StatsTest extends QATestCase
 {
     use RefreshDatabase;
 
-    public function test_user_has_no_question_yet(): void
-    {
-        $this->login()
-            ->expectsChoice('Choose one option', QAStatesEnum::Stats, QAStatesEnum::mainMenu())
-            ->expectsOutput('You do not have any question!')
-            ->expectsChoice('Choose one option', QAStatesEnum::Exit, QAStatesEnum::mainMenu());
-    }
-
     /**
      * @dataProvider statsDataProvider
      *
@@ -45,6 +37,16 @@ class StatsTest extends QATestCase
     public function statsDataProvider(): array
     {
         return [
+            [
+                'total' => 0,
+                'answered_percentage' => '%0',
+                'correct_percentage' => '%0',
+                'statuses' => [
+                    'Not answered' => 0,
+                    'Correct' => 0,
+                    'Incorrect' => 0,
+                ]
+            ],
             [
                 'total' => 20,
                 'answered_percentage' => '%50',

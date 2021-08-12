@@ -21,8 +21,8 @@ class Practice implements StateInterface
     {
         $practices = $this->command->user()->questions()->get(['id', 'body', 'status', 'answer']);
 
-        if (empty($practices)) {
-            $this->command->warn('No question to answer.');
+        if ($practices->isEmpty() || $practices->where('status', '!=', 'Correct')->isEmpty()) {
+            $this->command->warn('No question to ask.');
             $result = $this->command->confirm('Want to Add one?', true);
 
             return $result ? QAStatesEnum::AddQuestion : QAStatesEnum::MainMenu;
