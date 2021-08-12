@@ -28,7 +28,7 @@ class QAMap implements StateMachineMapInterface
         $this->makeStates();
     }
 
-    private function makeStates(): array
+    private function makeStates(): void
     {
         $this->states = [
             /**

@@ -3,6 +3,7 @@
 namespace Tests\Feature\QACommand;
 
 use App\Models\User;
+use App\StateMachines\Machines\QA\QAStatesEnum;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -81,7 +82,7 @@ class AuthenticateTest extends TestCase
             ->expectsQuestion("Enter your email address\n If the email doesn't exist it will be created", $this->email)
             ->expectsQuestion("Enter your password", 'password')
             ->expectsOutput('You logged in successfully')
-            ->expectsChoice()
-            ->expectsOutput("User: {$this->email}");
+            ->expectsOutput("User: {$this->email}")
+            ->expectsChoice('Choose one option', 5, QAStatesEnum::mainMenu());
     }
 }
