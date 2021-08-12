@@ -39,10 +39,12 @@ class MainMenu implements StateInterface
         return QAStatesEnum::MainMenu;
     }
 
-    private function clearScreen()
+    private function clearScreen(): void
     {
-        if (!app()->environment('testing')) {
-            system('clear');
+        if (app()->environment('testing')) {
+            return;
         }
+
+        system('clear');
     }
 }
