@@ -17,7 +17,7 @@ class MainMenu implements StateInterface
 
     public function handle(): string
     {
-        $this->command->info(sprintf(' User: %s', $this->command->user()->email));
+        $this->command->info(sprintf('User: %s', $this->command->user()->email));
         $choice = $this->command->choice(
             'Choose one option',
             QAStatesEnum::mainMenu(),

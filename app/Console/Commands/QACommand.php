@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\User;
+use App\StateMachines\Machines\QA\QATransitions;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Support\Arrayable;
 use Symfony\Component\Console\Helper\Table;
@@ -48,7 +49,7 @@ class QACommand extends Command
     {
         $machine = app()->make('QAStateMachine');
 
-        return $machine->start($this);
+        return $machine->start($this, new QATransitions($this));
     }
 
     /**

@@ -23,7 +23,7 @@ class Authenticate implements StateInterface
 
     public function handle(): string
     {
-        list($email, $password) = $this->getInputs($this->command);
+        list($email, $password) = $this->getInputs();
 
         $user = User::where('email', $email)->first() ?? User::factory()->create(['email' => $email, 'name' => $email]);
         $authenticated = true;
@@ -33,7 +33,7 @@ class Authenticate implements StateInterface
         }
 
         if ($authenticated) {
-            $this->command->info(' You logged in successfully');
+            $this->command->info('You logged in successfully');
             $this->command->newLine();
             $this->command->setUser($user);
 
@@ -79,6 +79,7 @@ class Authenticate implements StateInterface
     private function getInputs(): array
     {
         $question = "Enter your email address\n If the email doesn't exist it will be created";
+//        $question = "Enter your email address";
         $email = $this->command->ask($question, 'test@test.com');
         $data = ['email' => $email];
 
