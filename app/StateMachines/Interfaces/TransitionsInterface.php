@@ -14,10 +14,6 @@ interface TransitionsInterface
 
     public function transitions(): array;
 
-    public function setInitialState(StateInterface $state): void;
-
-    public function setExitState(StateInterface $state): void;
-
     public function initialState(): StateInterface;
 
     public function exitState(): StateInterface;
