@@ -21,6 +21,13 @@ class Practice implements StateInterface
     {
         $practices = $this->command->user()->questions()->get(['id', 'body', 'status', 'answer']);
 
+        if (empty($practices)) {
+            $this->command->warn('No question to answer.');
+            $result = $this->command->confirm('Want to Add one?', true);
+
+            return $result ? QAStatesEnum::AddQuestion : QAStatesEnum::MainMenu;
+        }
+
         $this->drawProgressTable($practices);
 
         $this->askQuestion($practices);
@@ -44,16 +51,19 @@ class Practice implements StateInterface
     private function drawProgressTable($practices): void
     {
         $correct = $practices->where('status', 'Correct');
+        $completed = 0;
 
-        $completion = sprintf('%%%d answered correctly', number_format($correct->count() * 100 / $practices->count()));
+        if ($total = $practices->count()) {
+            $completed = number_format($correct->count() * 100 / $total);
+        }
 
-        $this->command->titledTable(
+        $progress = sprintf('%%%d answered correctly', $completed);
+
+        $this->command->table(
             ['ID', 'Question', 'Status'],
             $practices->map(function ($question) {
                 return $question->only(['id', 'body', 'status']);
             }),
-            'Practices',
-            $completion
         );
     }
 
@@ -68,7 +78,7 @@ class Practice implements StateInterface
 
         $selected = $this->command->choice('Choose one of the questions above',
             $notCorrectPractices->pluck('body', 'id')->toArray(),
-            $firstNotCorrect->id,
+            $firstNotCorrect->id ?? null,
         );
 
         $question = $notCorrectPractices->where('body', $selected)->first();

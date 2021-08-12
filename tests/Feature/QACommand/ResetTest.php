@@ -12,7 +12,7 @@ class ResetTest extends QATestCase
     use RefreshDatabase;
 
     /**
-     * @dataProvider statsDataProvider
+     * @dataProvider resetDataProvider
      *
      * @param string $confirm
      * @param array $statuses
@@ -33,7 +33,7 @@ class ResetTest extends QATestCase
         $this->assertEquals($not_answered_expected, $actual);
     }
 
-    public function statsDataProvider(): array
+    public function resetDataProvider(): array
     {
         return [
             [

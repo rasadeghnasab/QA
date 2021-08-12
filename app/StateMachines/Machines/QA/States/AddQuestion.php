@@ -20,8 +20,8 @@ class AddQuestion implements StateInterface
 
     public function handle(): string
     {
-        $body = $this->command->ask('Enter your question body please');
-        $answer = $this->command->ask('Enter the answer for your question');
+        $body = $this->command->ask('Enter the question body please');
+        $answer = $this->command->ask('Enter the answer please');
 
         $this->validate(['question' => $body, 'answer' => $answer]);
 

@@ -11,104 +11,77 @@ class PracticeTest extends QATestCase
 {
     use RefreshDatabase;
 
+    public function test_practice_should_go_to_add_question_on_no_question_exists()
+    {
+        $this->assertEquals(0, $this->user->questions()->count());
+
+        $this->login()
+            ->expectsChoice('Choose one option', QAStatesEnum::Practice, QAStatesEnum::mainMenu())
+            ->expectsOutput('No question to answer.')
+            ->expectsConfirmation('Want to Add one?', 'yes')
+            ->execute();
+//            ->run();
+
+            // add a question
+//            ->expectsQuestion('Enter the question body please', 'Question body')
+//            ->expectsQuestion('Enter the answer please', 'Question answer')
+//            ->expectsOutput('The question has been added successfully.')
+//            ->expectsConfirmation('Add another one?', 'no')
+
+            // back to main menu
+//            ->expectsChoice('Choose one option', QAStatesEnum::Exit, QAStatesEnum::mainMenu());
+    }
+
     /**
-     * @dataProvider statsDataProvider
+     * @dataProvider practiceDataProvider
      *
-     * @param string $confirm
      * @param array $statuses
-     * @param int $not_answered_expected
      */
-    public function test_confirmed_reset_should_change_all_questions_status_to_not_answered(string $confirm, array $statuses, int $not_answered_expected): void
+    public function test_practice_draw_table_as_we_expected(array $statuses): void
     {
         foreach ($statuses as $status => $count) {
             Question::factory($count)->create(['user_id' => $this->user->id, 'status' => $status]);
         }
 
         $this->login()
-            ->expectsChoice('Choose one option', QAStatesEnum::Reset, QAStatesEnum::mainMenu())
-            ->expectsConfirmation('Are you sure? (You can not undo this action)', $confirm);
-
-        $actual = $this->user->questions()->where('status', 'Not answered')->count();
-
-        $this->assertEquals($not_answered_expected, $actual);
+            ->expectsChoice('Choose one option', QAStatesEnum::Practice, QAStatesEnum::mainMenu())
+            ->expectsTable(
+                ['ID', 'Question', 'Status'],
+                $this->user->questions()->where('Status', '!=', 'Correct')->get(['id', 'body', 'status'])->toArray()
+            );
     }
 
-    public function statsDataProvider(): array
+    public function practiceDataProvider(): array
     {
         return [
             [
-                'confirm' => 'yes',
                 'statuses' => [
                     'Not answered' => 10,
                     'Correct' => 5,
                     'Incorrect' => 5,
                 ],
-                'not_answered_expected' => 20,
             ],
-            [
-                'confirm' => 'yes',
-                'statuses' => [
-                    'Not answered' => 20,
-                    'Correct' => 0,
-                    'Incorrect' => 0,
-                ],
-                'not_answered_expected' => 20,
-            ],
-            [
-                'confirm' => 'yes',
-                'statuses' => [
-                    'Not answered' => 0,
-                    'Correct' => 0,
-                    'Incorrect' => 20,
-                ],
-                'not_answered_expected' => 20,
-            ],
-            [
-                'confirm' => 'yes',
-                'statuses' => [
-                    'Not answered' => 0,
-                    'Correct' => 20,
-                    'Incorrect' => 0,
-                ],
-                'not_answered_expected' => 20,
-            ],
-            // No
-            [
-                'confirm' => 'no',
-                'statuses' => [
-                    'Not answered' => 10,
-                    'Correct' => 5,
-                    'Incorrect' => 5,
-                ],
-                'not_answered_expected' => 10,
-            ],
-            [
-                'confirm' => 'no',
-                'statuses' => [
-                    'Not answered' => 20,
-                    'Correct' => 0,
-                    'Incorrect' => 0,
-                ],
-                'not_answered_expected' => 20,
-            ],
-            [
-                'confirm' => 'no',
-                'statuses' => [
-                    'Not answered' => 0,
-                    'Correct' => 0,
-                    'Incorrect' => 20,
-                ],
-                'not_answered_expected' => 0,
-            ],
-            [
-                'confirm' => 'no',
-                'statuses' => [
-                    'Not answered' => 0,
-                    'Correct' => 20,
-                    'Incorrect' => 0,
-                ],
-                'not_answered_expected' => 0,
-            ],
+//            [
+//                'statuses' => [
+//                    'Not answered' => 20,
+//                    'Correct' => 0,
+//                    'Incorrect' => 0,
+//                ],
+//            ],
+//            [
+//                'statuses' => [
+//                    'Not answered' => 0,
+//                    'Correct' => 0,
+//                    'Incorrect' => 20,
+//                ],
+//            ],
+//            [
+//                'statuses' => [
+//                    'Not answered' => 0,
+//                    'Correct' => 20,
+//                    'Incorrect' => 0,
+//                ],
+//            ],
         ];
     }
 }

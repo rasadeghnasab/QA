@@ -114,6 +114,10 @@ class QAMap implements StateMachineMapInterface
                 'source' => $this->states[QAStatesEnum::Reset],
                 'destination' => $this->states[QAStatesEnum::MainMenu],
             ],
+            [
+                'source' => $this->states[QAStatesEnum::Practice],
+                'destination' => $this->states[QAStatesEnum::AddQuestion],
+            ],
         ];
     }
 
