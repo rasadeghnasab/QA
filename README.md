@@ -9,14 +9,39 @@ You have to have `docker` and `docker-composer` installed on your system in orde
 ---
 # Up and Running
 1. clone the repository
-    - `git clone git@github.com:rasadeghnasab/QA`
+    ```bash
+    git clone git@github.com:rasadeghnasab/QA
+    ```
 
 2. cd to the repository directory
-    - `cd QA`
+    ```bash
+    cd QA
+    ```
     
 3. up and run the project
-    - `make project` 
+    ```bash
+    make project
+    ```
     - Note: You can use `sudo make project` if it gives you any permission error
+---
+### Existing user:
+
+- test@test.com
+- password
+
+---
+# How to use
+
+- default behavior: only ask for email. It will create a user for your if it doesn't exist already.
+
+```bash
+vendor/bin/sail artisan qanda:interactive
+```
+
+- full credential required. It will ask for your email and password.
+```bash
+vendor/bin/sail artisan qanda:interactive --with-password
+```
 
 ---
 # A quick note for the reviewers
