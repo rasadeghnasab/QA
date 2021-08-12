@@ -9,32 +9,25 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
-class AddQuestion implements StateInterface
+class AddQuestion extends Command implements StateInterface
 {
-    private Command $command;
-
-    public function __construct(Command $command)
-    {
-        $this->command = $command;
-    }
-
     public function handle(): string
     {
-        $body = $this->command->ask('Enter the question body please');
-        $answer = $this->command->ask('Enter the answer please');
+        $body = $this->ask('Enter the question body please');
+        $answer = $this->ask('Enter the answer please');
 
         $this->validate(['question' => $body, 'answer' => $answer]);
 
-        $this->command->user()->questions()->save(
+        $this->user()->questions()->save(
             new Question([
                 'body' => $body,
                 'answer' => $answer,
             ])
         );
 
-        $this->command->info('The question has been added successfully.');
+        $this->info('The question has been added successfully.');
 
-        return $this->command->confirm('Add another one?', true) ? QAStatesEnum::AddQuestion : QAStatesEnum::MainMenu;
+        return $this->confirm('Add another one?', true) ? QAStatesEnum::AddQuestion : QAStatesEnum::MainMenu;
     }
 
     public function name(): string

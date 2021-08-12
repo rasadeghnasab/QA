@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\StateMachines\Machines\QA\QAMachine;
+use App\StateMachines\Machines\QA\QAMap;
 use App\StateMachines\StateMachine;
 use Illuminate\Support\ServiceProvider;
 
@@ -22,6 +23,8 @@ class QAServiceProvider extends ServiceProvider
         $this->app->bind('QAStateMachine', function ($app) {
             return new QAMachine($app->make('StateMachine'));
         });
+
+        $this->commands((new QAMap)->states());
     }
 
     /**

@@ -6,23 +6,16 @@ use App\StateMachines\Interfaces\StateInterface;
 use App\StateMachines\Machines\QA\QAStatesEnum;
 use Illuminate\Console\Command;
 
-class Reset implements StateInterface
+class Reset extends Command implements StateInterface
 {
-    private Command $command;
-
-    public function __construct(Command $command)
-    {
-        $this->command = $command;
-    }
-
     public function handle(): string
     {
-        if (!$this->command->confirm('Are you sure? (You can not undo this action)')) {
+        if (!$this->confirm('Are you sure? (You can not undo this action)')) {
             return QAStatesEnum::MainMenu;
         }
 
-        $this->command->user()->questions()->update(['status' => 'Not answered']);
-        $this->command->warn('Your questions are marked as `Not answered`.');
+        $this->user()->questions()->update(['status' => 'Not answered']);
+        $this->warn('Your questions are marked as `Not answered`.');
 
         return QAStatesEnum::MainMenu;
     }

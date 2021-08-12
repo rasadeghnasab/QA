@@ -10,15 +10,13 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
-class Authenticate implements StateInterface
+class Authenticate extends Command implements StateInterface
 {
     private bool $withPassword;
-    private Command $command;
 
-    public function __construct(Command $command)
+    public function __construct()
     {
-        $this->command = $command;
-        $this->withPassword = (bool)$command->option('with-password');
+        $this->withPassword = (bool)$this->option('with-password');
     }
 
     public function handle(): string
@@ -33,14 +31,14 @@ class Authenticate implements StateInterface
         }
 
         if ($authenticated) {
-            $this->command->info('You logged in successfully');
-            $this->command->newLine();
-            $this->command->setUser($user);
+            $this->info('You logged in successfully');
+            $this->newLine();
+            $this->setUser($user);
 
             return QAStatesEnum::MainMenu;
         }
 
-        $this->command->error('Authentication failed. Please try again.');
+        $this->error('Authentication failed. Please try again.');
 
         return QAStatesEnum::Authenticate;
     }
@@ -80,12 +78,12 @@ class Authenticate implements StateInterface
     {
         $question = "Enter your email address\n If the email doesn't exist it will be created";
 //        $question = "Enter your email address";
-        $email = $this->command->ask($question, 'test@test.com');
+        $email = $this->ask($question, 'test@test.com');
         $data = ['email' => $email];
 
         $password = '';
         if ($this->withPassword) {
-            $password = $this->command->secret('Enter your password');
+            $password = $this->secret('Enter your password');
             $data['password'] = $password;
         }
 

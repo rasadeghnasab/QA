@@ -6,19 +6,12 @@ use App\StateMachines\Interfaces\StateInterface;
 use App\StateMachines\Machines\QA\QAStatesEnum;
 use Illuminate\Console\Command;
 
-class MainMenu implements StateInterface
+class MainMenu extends Command implements StateInterface
 {
-    private Command $command;
-
-    public function __construct(Command $command)
-    {
-        $this->command = $command;
-    }
-
     public function handle(): string
     {
-        $this->command->info(sprintf('User: %s', $this->command->user()->email));
-        $choice = $this->command->choice(
+        $this->info(sprintf('User: %s', $this->user()->email));
+        $choice = $this->choice(
             'Choose one option',
             QAStatesEnum::mainMenu(),
             $defaultIndex = 0

@@ -6,18 +6,11 @@ use App\StateMachines\Interfaces\StateInterface;
 use App\StateMachines\Machines\QA\QAStatesEnum;
 use Illuminate\Console\Command;
 
-class ExitApp implements StateInterface
+class ExitApp extends Command implements StateInterface
 {
-    private Command $command;
-
-    public function __construct(Command $command)
-    {
-        $this->command = $command;
-    }
-
     public function handle(): string
     {
-        $this->command->info(sprintf('Goodbye `%s`.', $this->command->user()->name));
+        $this->info(sprintf('Goodbye `%s`.', $this->user()->name));
 
         return QAStatesEnum::Exit;
     }

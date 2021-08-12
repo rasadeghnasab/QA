@@ -8,26 +8,19 @@ use Illuminate\Console\Command;
 use Symfony\Component\Console\Helper\TableCell;
 use Symfony\Component\Console\Helper\TableCellStyle;
 
-class ListQuestions implements StateInterface
+class ListQuestions extends Command implements StateInterface
 {
-    private Command $command;
-
-    public function __construct(Command $command)
-    {
-        $this->command = $command;
-    }
-
     public function handle(): string
     {
-        $questions = $this->command->user()->questions()->get(['id', 'body'])->toArray();
+        $questions = $this->user()->questions()->get(['id', 'body'])->toArray();
 
         if (empty($questions)) {
-            $this->command->warn('You do not have any question!');
+            $this->warn('You do not have any question!');
 
             return QAStatesEnum::MainMenu;
         }
 
-        $this->command->table(
+        $this->table(
             ['ID', 'Question'],
             $questions,
         );

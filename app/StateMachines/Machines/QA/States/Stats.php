@@ -6,18 +6,25 @@ use App\StateMachines\Interfaces\StateInterface;
 use App\StateMachines\Machines\QA\QAStatesEnum;
 use Illuminate\Console\Command;
 
-class Stats implements StateInterface
+class Stats extends Command implements StateInterface
 {
-    private Command $command;
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'qanda:stats {user}';
 
-    public function __construct(Command $command)
-    {
-        $this->command = $command;
-    }
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Q&A app made with Laravel + Artisan';
 
     public function handle(): string
     {
-        $questions = $this->command->user()->questions()->get();
+        $questions = $this->user()->questions()->get();
 
         $answered = $correct = 0;
         if ($all = $questions->count()) {
@@ -28,12 +35,12 @@ class Stats implements StateInterface
             $correct = number_format($correct * 100 / $all);
         }
 
-        $this->command->table(['Title', 'Value'], [
+        $this->table(['Title', 'Value'], [
             ['Total', $all],
             ['Answered', sprintf('%%%s', $answered)],
             ['Correct', sprintf('%%%s', $correct)]
         ]);
-        $this->command->newLine();
+        $this->newLine();
 
         return QAStatesEnum::MainMenu;
     }
@@ -46,5 +53,10 @@ class Stats implements StateInterface
     public function action(): string
     {
         return QAStatesEnum::Stats;
+    }
+
+    public function signature(): string
+    {
+        return $this->signature;
     }
 }

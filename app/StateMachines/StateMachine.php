@@ -6,6 +6,7 @@ use App\StateMachines\Interfaces\TransitionsInterface;
 use Exception;
 use App\StateMachines\Interfaces\MachineInterface;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Validation\ValidationException;
 
 class StateMachine implements MachineInterface
@@ -23,7 +24,8 @@ class StateMachine implements MachineInterface
         do {
             try {
                 $currentState = $transitions->next($currentState, $action);
-                $action = $currentState->handle();
+//                $action = $currentState->handle();
+                Artisan::call($currentState->signature(), ['user' => $command->user()]);
             } catch (ValidationException $validationException) {
                 foreach (collect($validationException->errors())->flatten() as $error) {
                     $command->warn($error);

@@ -18,13 +18,10 @@ use Illuminate\Console\Command;
 
 class QAMap implements StateMachineMapInterface
 {
-    private Command $command;
     private array $states;
 
-    public function __construct(Command $command)
+    public function __construct()
     {
-        $this->command = $command;
-
         $this->makeStates();
     }
 
@@ -35,14 +32,14 @@ class QAMap implements StateMachineMapInterface
              * if you remove the onlyEmail it will prompt for email and password
              * but now authentication system only ask for the password
              */
-            QAStatesEnum::Authenticate => new Authenticate($this->command),
-            QAStatesEnum::MainMenu => new MainMenu($this->command),
-            QAStatesEnum::AddQuestion => new AddQuestion($this->command),
-            QAStatesEnum::ListQuestions => new ListQuestions($this->command),
-            QAStatesEnum::Practice => new Practice($this->command),
-            QAStatesEnum::Stats => new Stats($this->command),
-            QAStatesEnum::Reset => new Reset($this->command),
-            QAStatesEnum::Exit => new ExitApp($this->command),
+            QAStatesEnum::Authenticate => Authenticate::class,
+            QAStatesEnum::MainMenu => MainMenu::class,
+            QAStatesEnum::AddQuestion => AddQuestion::class,
+            QAStatesEnum::ListQuestions => ListQuestions::class,
+            QAStatesEnum::Practice => Practice::class,
+            QAStatesEnum::Stats => Stats::class,
+            QAStatesEnum::Reset => Reset::class,
+            QAStatesEnum::Exit => ExitApp::class,
         ];
     }
 

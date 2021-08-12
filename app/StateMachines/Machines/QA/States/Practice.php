@@ -8,22 +8,15 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
-class Practice implements StateInterface
+class Practice extends Command implements StateInterface
 {
-    private Command $command;
-
-    public function __construct(Command $command)
-    {
-        $this->command = $command;
-    }
-
     public function handle(): string
     {
-        $practices = $this->command->user()->questions()->get(['id', 'body', 'status', 'answer']);
+        $practices = $this->user()->questions()->get(['id', 'body', 'status', 'answer']);
 
         if (empty($practices)) {
-            $this->command->warn('No question to answer.');
-            $result = $this->command->confirm('Want to Add one?', true);
+            $this->warn('No question to answer.');
+            $result = $this->confirm('Want to Add one?', true);
 
             return $result ? QAStatesEnum::AddQuestion : QAStatesEnum::MainMenu;
         }
@@ -32,7 +25,7 @@ class Practice implements StateInterface
 
         $this->askQuestion($practices);
 
-        return $this->command->confirm('Continue?', true) ? QAStatesEnum::Practice : QAStatesEnum::MainMenu;
+        return $this->confirm('Continue?', true) ? QAStatesEnum::Practice : QAStatesEnum::MainMenu;
     }
 
     public function name(): string
@@ -59,7 +52,7 @@ class Practice implements StateInterface
 
         $progress = sprintf('%%%d answered correctly', $completed);
 
-        $this->command->table(
+        $this->table(
             ['ID', 'Question', 'Status'],
             $practices->map(function ($question) {
                 return $question->only(['id', 'body', 'status']);
@@ -76,7 +69,7 @@ class Practice implements StateInterface
         $notCorrectPractices = $practices->where('status', '!=', 'Correct');
         $firstNotCorrect = $notCorrectPractices->first();
 
-        $selected = $this->command->choice('Choose one of the questions above',
+        $selected = $this->choice('Choose one of the questions above',
             $notCorrectPractices->pluck('body', 'id')->toArray(),
             $firstNotCorrect->id ?? null,
         );
@@ -87,10 +80,10 @@ class Practice implements StateInterface
 
         if ($question->answer === $userAnswer) {
             $status = 'Correct';
-            $this->command->info($status);
+            $this->info($status);
         } else {
             $status = 'Incorrect';
-            $this->command->error($status);
+            $this->error($status);
         }
 
         $question->status = $status;
@@ -104,12 +97,12 @@ class Practice implements StateInterface
         do {
             try {
                 $valid = true;
-                $answer = $this->command->ask($questionBody);
+                $answer = $this->ask($questionBody);
 
                 $this->validate(['answer' => $answer]);
             } catch (ValidationException $validationException) {
                 foreach (collect($validationException->errors())->flatten() as $error) {
-                    $this->command->warn($error);
+                    $this->warn($error);
                 }
                 $valid = false;
             }
