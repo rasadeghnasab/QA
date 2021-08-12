@@ -4,5 +4,5 @@ namespace App\StateMachines\Interfaces;
 
 interface TransitionInterface
 {
-    public function destination(StateInterface $currentStateState, string $action): StateInterface|bool;
+    public function destination(StateInterface $currentState, string $action): ?StateInterface;
 }

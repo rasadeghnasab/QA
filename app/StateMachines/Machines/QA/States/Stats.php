@@ -28,13 +28,11 @@ class Stats implements StateInterface
             $correct = number_format($correct * 100 / $all);
         }
 
-        $this->command->titledTable(['Title', 'Value'], [
+        $this->command->table(['Title', 'Value'], [
             ['Total', $all],
             ['Answered', sprintf('%%%s', $answered)],
             ['Correct', sprintf('%%%s', $correct)]
-        ],
-            'Stats'
-        );
+        ]);
         $this->command->newLine();
 
         return QAStatesEnum::MainMenu;
