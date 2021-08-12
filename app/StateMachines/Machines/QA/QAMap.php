@@ -19,15 +19,18 @@ use Illuminate\Console\Command;
 class QAMap implements StateMachineMapInterface
 {
     private Command $command;
+    private array $states;
 
     public function __construct(Command $command)
     {
         $this->command = $command;
+
+        $this->makeStates();
     }
 
-    public function states(): array
+    private function makeStates(): array
     {
-        return [
+        $this->states = [
             /**
              * if you remove the onlyEmail it will prompt for email and password
              * but now authentication system only ask for the password
@@ -43,81 +46,84 @@ class QAMap implements StateMachineMapInterface
         ];
     }
 
+    public function states(): array
+    {
+        return $this->states;
+    }
+
     public function path(): array
     {
-        $states = $this->states();
-
         return [
             [
-                'source' => $states[QAStatesEnum::Authenticate],
-                'destination' => $states[QAStatesEnum::Authenticate],
+                'source' => $this->states[QAStatesEnum::Authenticate],
+                'destination' => $this->states[QAStatesEnum::Authenticate],
             ],
             [
-                'source' => $states[QAStatesEnum::MainMenu],
-                'destination' => $states[QAStatesEnum::AddQuestion],
+                'source' => $this->states[QAStatesEnum::MainMenu],
+                'destination' => $this->states[QAStatesEnum::AddQuestion],
             ],
             [
-                'source' => $states[QAStatesEnum::MainMenu],
-                'destination' => $states[QAStatesEnum::ListQuestions],
+                'source' => $this->states[QAStatesEnum::MainMenu],
+                'destination' => $this->states[QAStatesEnum::ListQuestions],
             ],
             [
-                'source' => $states[QAStatesEnum::MainMenu],
-                'destination' => $states[QAStatesEnum::Practice],
+                'source' => $this->states[QAStatesEnum::MainMenu],
+                'destination' => $this->states[QAStatesEnum::Practice],
             ],
             [
-                'source' => $states[QAStatesEnum::MainMenu],
-                'destination' => $states[QAStatesEnum::Stats],
+                'source' => $this->states[QAStatesEnum::MainMenu],
+                'destination' => $this->states[QAStatesEnum::Stats],
             ],
             [
-                'source' => $states[QAStatesEnum::MainMenu],
-                'destination' => $states[QAStatesEnum::Reset],
+                'source' => $this->states[QAStatesEnum::MainMenu],
+                'destination' => $this->states[QAStatesEnum::Reset],
             ],
             [
-                'source' => $states[QAStatesEnum::MainMenu],
-                'destination' => $states[QAStatesEnum::Exit],
+                'source' => $this->states[QAStatesEnum::MainMenu],
+                'destination' => $this->states[QAStatesEnum::Exit],
             ],
             [
-                'source' => $states[QAStatesEnum::Practice],
-                'destination' => $states[QAStatesEnum::Practice],
+                'source' => $this->states[QAStatesEnum::Practice],
+                'destination' => $this->states[QAStatesEnum::Practice],
             ],
             [
-                'source' => $states[QAStatesEnum::AddQuestion],
-                'destination' => $states[QAStatesEnum::AddQuestion],
+                'source' => $this->states[QAStatesEnum::AddQuestion],
+                'destination' => $this->states[QAStatesEnum::AddQuestion],
             ],
             [
-                'source' => $states[QAStatesEnum::Authenticate],
-                'destination' => $states[QAStatesEnum::MainMenu],
+                'source' => $this->states[QAStatesEnum::Authenticate],
+                'destination' => $this->states[QAStatesEnum::MainMenu],
             ],
             [
-                'source' => $states[QAStatesEnum::AddQuestion],
-                'destination' => $states[QAStatesEnum::MainMenu],
+                'source' => $this->states[QAStatesEnum::AddQuestion],
+                'destination' => $this->states[QAStatesEnum::MainMenu],
             ],
             [
-                'source' => $states[QAStatesEnum::ListQuestions],
-                'destination' => $states[QAStatesEnum::MainMenu],
+                'source' => $this->states[QAStatesEnum::ListQuestions],
+                'destination' => $this->states[QAStatesEnum::MainMenu],
             ],
             [
-                'source' => $states[QAStatesEnum::Practice],
-                'destination' => $states[QAStatesEnum::MainMenu],
+                'source' => $this->states[QAStatesEnum::Practice],
+                'destination' => $this->states[QAStatesEnum::MainMenu],
             ],
             [
-                'source' => $states[QAStatesEnum::Stats],
-                'destination' => $states[QAStatesEnum::MainMenu],
+                'source' => $this->states[QAStatesEnum::Stats],
+                'destination' => $this->states[QAStatesEnum::MainMenu],
             ],
             [
-                'source' => $states[QAStatesEnum::Reset],
-                'destination' => $states[QAStatesEnum::MainMenu],
+                'source' => $this->states[QAStatesEnum::Reset],
+                'destination' => $this->states[QAStatesEnum::MainMenu],
             ],
         ];
     }
 
     public function initialState(): StateInterface
     {
-        return $this->states()[QAStatesEnum::Authenticate];
+        return $this->states[QAStatesEnum::Authenticate];
     }
 
     public function exitState(): StateInterface
     {
-        return $this->states()[QAStatesEnum::Exit];
+        return $this->states[QAStatesEnum::Exit];
     }
 }
