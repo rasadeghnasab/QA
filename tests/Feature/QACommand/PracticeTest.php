@@ -5,6 +5,8 @@ namespace Tests\Feature\QACommand;
 use App\Models\Question;
 use App\StateMachines\Machines\QA\QAStatesEnum;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Symfony\Component\Console\Helper\TableCell;
+use Symfony\Component\Console\Helper\TableCellStyle;
 use Tests\Feature\QATestCase;
 
 class PracticeTest extends QATestCase
@@ -49,7 +51,7 @@ class PracticeTest extends QATestCase
 
         $this->login()
             ->expectsChoice('Choose one option', QAStatesEnum::Practice, QAStatesEnum::mainMenu())
-            ->expectsTable(['ID', 'Question', 'Status'], $notCorrect->toArray())
+            ->expectsTable(['ID', 'Question', 'Status'], [...$notCorrect->toArray(), [$this->practiceTableFooter($statuses)]])
             ->expectsChoice('Choose one of the questions above', $firstElement->body, $notCorrect->pluck('body', 'id')->toArray())
             ->expectsQuestion($firstElement->body, $firstElement->answer)
             ->expectsOutput('Correct')
@@ -82,7 +84,7 @@ class PracticeTest extends QATestCase
 
         $this->login()
             ->expectsChoice('Choose one option', QAStatesEnum::Practice, QAStatesEnum::mainMenu())
-            ->expectsTable(['ID', 'Question', 'Status'], $notCorrect->toArray())
+            ->expectsTable(['ID', 'Question', 'Status'], [...$notCorrect->toArray(), [$this->practiceTableFooter($statuses)]])
             ->expectsChoice('Choose one of the questions above', $firstElement->body, $notCorrect->pluck('body', 'id')->toArray())
             ->expectsQuestion($firstElement->body, $wrongAnswer)
             ->expectsOutput('Incorrect')
@@ -117,7 +119,7 @@ class PracticeTest extends QATestCase
 
         $this->login()
             ->expectsChoice('Choose one option', QAStatesEnum::Practice, QAStatesEnum::mainMenu())
-            ->expectsTable(['ID', 'Question', 'Status'], $notCorrect->toArray())
+            ->expectsTable(['ID', 'Question', 'Status'], [...$notCorrect->toArray(), [$this->practiceTableFooter($statuses)]])
             ->expectsChoice('Choose one of the questions above', $firstElement->body, $notCorrect->pluck('body', 'id')->toArray())
             ->expectsQuestion($firstElement->body, $emptyAnswer)
             ->expectsOutput('The answer field is required.')
@@ -153,5 +155,23 @@ class PracticeTest extends QATestCase
                 ],
             ],
         ];
+    }
+
+    private function practiceTableFooter(array $statuses): TableCell
+    {
+        $total = $statuses['Not answered'] + $statuses['Correct'] + $statuses['Incorrect'];
+        $progress = $statuses['Correct'] * 100 / $total;
+
+        return new TableCell(
+            sprintf('%%%s', $progress),
+            [
+                'colspan' => 3,
+                'style' => new TableCellStyle([
+                    'align' => 'center',
+                    'fg' => 'white',
+                    'bg' => 'cyan',
+                ])
+            ]
+        );
     }
 }
