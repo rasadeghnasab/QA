@@ -22,19 +22,19 @@ You have to have `docker` and `docker-composer` installed on your system in orde
     ```shell script
     make install
     ```
-    - Note: You can use `sudo make project` if it gives you any permission error
+    - Note: You can use `sudo make install` if it gives you any permission error
 
-4. wait for all the service to be up. You can check them by the command below
+4. wait for all the services to be up. You can check them by the command below
     ```shell script
     make status
     ```
 
-5. if all the services were up now you can migrate tables
+5. if all the services were up, now you can migrate tables
     ```shell script
     make migrate
     ```
    
-6. you can run the Q&A by using these two commands. pass `--with-password` option if you need full authentication.
+6. you can run the Q&A by using these two commands. pass `--with-password` flag if you need full authentication.
     ```shell script
     # login with email
     ./vendor/bin/sail artisan qanda:interactive
@@ -62,8 +62,3 @@ vendor/bin/sail artisan qanda:interactive
 ```shell script
 vendor/bin/sail artisan qanda:interactive --with-password
 ```
-
----
-# A quick note for the reviewers
-
-- I wrote test functions name in a snake_case type to be more readable despite that breaks the PSR-12 rules.
