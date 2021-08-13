@@ -9,20 +9,38 @@ You have to have `docker` and `docker-composer` installed on your system in orde
 ---
 # Up and Running
 1. clone the repository
-    ```bash
+    ```shell script
     git clone git@github.com:rasadeghnasab/QA
     ```
 
 2. cd to the repository directory
-    ```bash
+    ```shell script
     cd QA
     ```
     
 3. up and run the project
-    ```bash
+    ```shell script
     make install
     ```
     - Note: You can use `sudo make project` if it gives you any permission error
+
+4. wait for all the service to be up. You can check them by the command below
+    ```shell script
+    make status
+    ```
+
+5. if all the services were up now you can migrate tables
+    ```shell script
+    make migrate
+    ```
+   
+6. you can run the Q&A by using these two commands
+    ```shell script
+    make start
+
+    ./vendor/bin/sail artisan qanda:interactive
+    ```
+
 ---
 ### Existing user:
 
@@ -34,12 +52,12 @@ You have to have `docker` and `docker-composer` installed on your system in orde
 
 - default behavior: only ask for email. It will create a user for your if it doesn't exist already.
 
-```bash
+```shell script
 vendor/bin/sail artisan qanda:interactive
 ```
 
 - full credential required. It will ask for your email and password.
-```bash
+```shell script
 vendor/bin/sail artisan qanda:interactive --with-password
 ```
 

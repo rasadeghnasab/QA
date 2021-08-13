@@ -15,11 +15,21 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
+        User::truncate();
+
+        $email = 'test@test.com';
+        $password = 'password';
+
         User::factory()->create([
             'email' => 'test@test.com',
             'password' => Hash::make('password'),
         ]);
 
-        User::factory(10)->create();
+        $userInfo = <<<EOT
+<bg=cyan;fg=bright-white>\t User: {$email} </>
+<bg=cyan;fg=bright-white>\t Pass: {$password}      </>
+EOT;
+
+        $this->command->line("\n{$userInfo}\n");
     }
 }

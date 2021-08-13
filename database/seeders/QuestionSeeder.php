@@ -24,7 +24,5 @@ class QuestionSeeder extends Seeder
                 'answer' => "a{$i}",
             ]);
         }
-
-        Question::factory(30)->create();
     }
 }

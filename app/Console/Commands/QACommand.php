@@ -6,8 +6,6 @@ use App\Models\User;
 use App\StateMachines\Machines\QA\QAMap;
 use App\StateMachines\Machines\QA\QATransitions;
 use Illuminate\Console\Command;
-use Illuminate\Contracts\Support\Arrayable;
-use Symfony\Component\Console\Helper\Table;
 
 class QACommand extends Command
 {
