@@ -7,6 +7,8 @@ use App\StateMachines\Machines\QA\QAStatesEnum;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\Console\Helper\TableCell;
+use Symfony\Component\Console\Helper\TableCellStyle;
 
 class Practice implements StateInterface
 {
@@ -56,14 +58,15 @@ class Practice implements StateInterface
         if ($total = $practices->count()) {
             $completed = number_format($correct->count() * 100 / $total);
         }
+        $notCorrectQuestions = $practices->map(function ($question) {
+            return $question->only(['id', 'body', 'status']);
+        })->toArray();
 
-        $progress = sprintf('%%%d answered correctly', $completed);
+        $progressFooter = $this->practiceTableFooter($completed);
 
         $this->command->table(
             ['ID', 'Question', 'Status'],
-            $practices->map(function ($question) {
-                return $question->only(['id', 'body', 'status']);
-            }),
+            [...$notCorrectQuestions, [$progressFooter]]
         );
     }
 
@@ -133,5 +136,20 @@ class Practice implements StateInterface
         if ($validator->fails()) {
             throw new ValidationException($validator);
         }
+    }
+
+    private function practiceTableFooter(int $progress): TableCell
+    {
+        return new TableCell(
+            sprintf('%%%s', $progress),
+            [
+                'colspan' => 3,
+                'style' => new TableCellStyle([
+                    'align' => 'center',
+                    'fg' => 'white',
+                    'bg' => 'cyan',
+                ])
+            ]
+        );
     }
 }
