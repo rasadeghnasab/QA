@@ -34,11 +34,13 @@ You have to have `docker` and `docker-composer` installed on your system in orde
     make migrate
     ```
    
-6. you can run the Q&A by using these two commands
+6. you can run the Q&A by using these two commands. pass `--with-password` option if you need full authentication.
     ```shell script
-    make start
-
+    # login with email
     ./vendor/bin/sail artisan qanda:interactive
+
+    # login with email and password
+    ./vendor/bin/sail artisan qanda:interactive --with-password
     ```
 
 ---

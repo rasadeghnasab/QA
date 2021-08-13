@@ -163,7 +163,7 @@ class PracticeTest extends QATestCase
         $progress = $statuses['Correct'] * 100 / $total;
 
         return new TableCell(
-            sprintf('%%%s', $progress),
+            sprintf('Correct answers: %%%s', $progress),
             [
                 'colspan' => 3,
                 'style' => new TableCellStyle([

@@ -141,7 +141,7 @@ class Practice implements StateInterface
     private function practiceTableFooter(int $progress): TableCell
     {
         return new TableCell(
-            sprintf('%%%s', $progress),
+            sprintf('Correct answers: %%%s', $progress),
             [
                 'colspan' => 3,
                 'style' => new TableCellStyle([

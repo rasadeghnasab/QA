@@ -6,7 +6,7 @@ BOLD_GREEN=\033[1;32m
 
 COMMAND=sail artisan qanda:interactive
 
-run: install migrate start
+run: install migrate
 
 install: vendor
 	$(SAIL) up -d
@@ -18,10 +18,6 @@ install: vendor
 
 migrate: status
 	$(SAIL) artisan migrate:fresh --seed
-
-start:
-	@echo "${BOLD_GREEN}Please wait..."
-	@$(SAIL) artisan qanda:interactive
 
 status:
 	$(SAIL) ps

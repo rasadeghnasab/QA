@@ -18,7 +18,7 @@ class QuestionSeeder extends Seeder
         $user = User::where('email', 'test@test.com')->first();
 
         for ($i = 0; $i < 10; $i++) {
-            Question::factory(25)->create([
+            Question::factory()->create([
                 'user_id' => $user->id,
                 'body' => "q{$i}",
                 'answer' => "a{$i}",
