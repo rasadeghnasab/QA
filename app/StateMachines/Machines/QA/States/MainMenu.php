@@ -24,7 +24,7 @@ class MainMenu implements StateInterface
             $defaultIndex = 0
         );
 
-        $this->clearScreen();
+        $this->command->clearScreen();
 
         return $choice;
     }
@@ -37,14 +37,5 @@ class MainMenu implements StateInterface
     public function action(): string
     {
         return QAStatesEnum::MainMenu;
-    }
-
-    private function clearScreen(): void
-    {
-        if (app()->environment('testing')) {
-            return;
-        }
-
-        system('clear');
     }
 }

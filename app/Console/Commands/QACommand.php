@@ -48,8 +48,28 @@ class QACommand extends Command
      */
     public function handle()
     {
+        $this->clearScreen();
         $machine = app()->make('QAStateMachine');
 
         return $machine->start($this, new QATransitions(new QAMap($this)));
+    }
+
+    public function clearScreen(): void
+    {
+        if (app()->environment('testing')) {
+            return;
+        }
+
+        if ($this->isLinux()) {
+            system('clear');
+            return;
+        }
+
+        system('cls');
+    }
+
+    private function isLinux(): bool
+    {
+        return PHP_OS === 'Linux';
     }
 }

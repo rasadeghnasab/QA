@@ -20,7 +20,7 @@ You have to have `docker` and `docker-composer` installed on your system in orde
     
 3. up and run the project
     ```bash
-    make project
+    make install
     ```
     - Note: You can use `sudo make project` if it gives you any permission error
 ---
