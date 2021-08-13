@@ -66,7 +66,7 @@ class Practice implements StateInterface
 
         $this->command->table(
             ['ID', 'Question', 'Status'],
-            [...$notCorrectQuestions, [$progressFooter]]
+            [...$notCorrectQuestions, ...$progressFooter]
         );
     }
 
@@ -138,18 +138,48 @@ class Practice implements StateInterface
         }
     }
 
-    private function practiceTableFooter(int $progress): TableCell
+    private function practiceTableFooter(int $progress): array
     {
-        return new TableCell(
-            sprintf('Correct answers: %%%s', $progress),
+        return [
             [
-                'colspan' => 3,
-                'style' => new TableCellStyle([
-                    'align' => 'center',
-                    'fg' => 'white',
-                    'bg' => 'cyan',
-                ])
-            ]
-        );
+                new TableCell(
+                    '',
+                    [
+                        'colspan' => 3,
+                        'style' => new TableCellStyle([
+                            'align' => 'center',
+                            'fg' => 'white',
+                            'bg' => 'cyan',
+                        ])
+                    ]
+                ),
+            ],
+            [
+                new TableCell(
+                    sprintf('Correct answers: %%%s', $progress),
+                    [
+                        'colspan' => 3,
+                        'style' => new TableCellStyle([
+                            'align' => 'center',
+                            'fg' => 'white',
+                            'bg' => 'cyan',
+                        ])
+                    ]
+                ),
+            ],
+            [
+                new TableCell(
+                    '',
+                    [
+                        'colspan' => 3,
+                        'style' => new TableCellStyle([
+                            'align' => 'center',
+                            'fg' => 'white',
+                            'bg' => 'cyan',
+                        ])
+                    ]
+                ),
+            ],
+        ];
     }
 }
