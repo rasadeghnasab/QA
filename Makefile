@@ -11,19 +11,27 @@ run: install migrate start
 install: vendor
 	$(SAIL) up -d
 	cp .env.example .env
-	#$(SAIL) artisan sail:install --with=mysql
+	$(SAIL) artisan sail:install --with=mysql
 	$(SAIL) artisan key:generate
+	@echo "Wait until all services up successfully"
+	@echo "You can check the services status using ${BOLD_GREEN}make status"
 
-migrate:
-	$(SAIL) ps
+migrate: status
 	$(SAIL) artisan migrate:fresh --seed
 
 start:
 	@echo "${BOLD_GREEN}Please wait..."
 	@$(SAIL) artisan qanda:interactive
 
+status:
+	$(SAIL) ps
+
+down:
+	$(SAIL) down -v --remove-orphans
+
 purge:
 	$(SAIL) down -v --remove-orphans
+	rm -rf vendor
 
 vendor:
 	docker run --rm -u "$(shell id -u):$(shell id -g)" \
