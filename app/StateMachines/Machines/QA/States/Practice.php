@@ -4,7 +4,6 @@ namespace App\StateMachines\Machines\QA\States;
 
 use App\StateMachines\Interfaces\StateInterface;
 use App\StateMachines\Machines\QA\QAStatesEnum;
-use Facade\Ignition\Tabs\Tab;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
