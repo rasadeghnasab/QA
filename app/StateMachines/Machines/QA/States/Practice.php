@@ -2,9 +2,13 @@
 
 namespace App\StateMachines\Machines\QA\States;
 
+use App\Enums\PracticeStatusEnum;
+use App\Models\Question;
+use App\Models\QuestionUser;
 use App\StateMachines\Interfaces\StateInterface;
 use App\StateMachines\Machines\QA\QAStatesEnum;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\Console\Helper\TableCell;
@@ -21,7 +25,19 @@ class Practice implements StateInterface
 
     public function handle(): string
     {
-        $practices = $this->command->user()->questions()->get(['id', 'body', 'status', 'answer']);
+        $practices = Question::select(
+            'questions.id',
+            'questions.body',
+            'questions.answer',
+            DB::raw(sprintf("IFNULL(question_user.status, '%s') as `status`", PracticeStatusEnum::NotAnswered))
+        )->leftJoin(
+            'question_user',
+            'questions.id',
+            'question_user.question_id'
+        )
+            ->where('question_user.user_id', '=', $this->command->user()->id)
+            ->orWhereNull('question_user.user_id')
+            ->get();
 
         if ($practices->isEmpty() || $practices->where('status', '!=', 'Correct')->isEmpty()) {
             $this->command->warn('No question to ask.');
@@ -79,25 +95,32 @@ class Practice implements StateInterface
         $notCorrectPractices = $practices->where('status', '!=', 'Correct');
         $firstNotCorrect = $notCorrectPractices->first();
 
-        $selected = $this->command->choice('Choose one of the questions above',
+        $selected = $this->command->choice(
+            'Choose one of the questions above',
             $notCorrectPractices->pluck('body', 'id')->toArray(),
             $firstNotCorrect->id ?? null,
         );
 
-        $question = $notCorrectPractices->where('body', $selected)->first();
+        $practice = $notCorrectPractices->where('body', $selected)->first();
 
-        $userAnswer = $this->getInputs($question->body);
+        $userAnswer = $this->getInputs($practice->body);
 
-        if ($question->answer === $userAnswer) {
-            $status = 'Correct';
-            $this->command->info($status);
-        } else {
-            $status = 'Incorrect';
-            $this->command->error($status);
+        $status = $practice->answer === $userAnswer ? PracticeStatusEnum::Correct : PracticeStatusEnum::Incorrect;
+        $this->command->warn($status);
+
+        if ($practice->status === PracticeStatusEnum::NotAnswered) {
+            QuestionUser::create([
+                                     'user_id' => $this->command->user()->id,
+                                     'question_id' => $practice->id,
+                                     'status' => $status,
+                                 ]);
+
+            return;
         }
 
-        $question->status = $status;
-        $question->save();
+        QuestionUser::where('user_id', '=', $this->command->user()->id)
+            ->where('question_id', '=', $practice->id)
+            ->update(['status' => $status]);
     }
 
     private function getInputs(string $questionBody): string
@@ -147,10 +170,10 @@ class Practice implements StateInterface
                     [
                         'colspan' => 3,
                         'style' => new TableCellStyle([
-                            'align' => 'center',
-                            'fg' => 'white',
-                            'bg' => 'cyan',
-                        ])
+                                                          'align' => 'center',
+                                                          'fg' => 'white',
+                                                          'bg' => 'cyan',
+                                                      ])
                     ]
                 ),
             ],
@@ -160,10 +183,10 @@ class Practice implements StateInterface
                     [
                         'colspan' => 3,
                         'style' => new TableCellStyle([
-                            'align' => 'center',
-                            'fg' => 'white',
-                            'bg' => 'cyan',
-                        ])
+                                                          'align' => 'center',
+                                                          'fg' => 'white',
+                                                          'bg' => 'cyan',
+                                                      ])
                     ]
                 ),
             ],
@@ -173,10 +196,10 @@ class Practice implements StateInterface
                     [
                         'colspan' => 3,
                         'style' => new TableCellStyle([
-                            'align' => 'center',
-                            'fg' => 'white',
-                            'bg' => 'cyan',
-                        ])
+                                                          'align' => 'center',
+                                                          'fg' => 'white',
+                                                          'bg' => 'cyan',
+                                                      ])
                     ]
                 ),
             ],

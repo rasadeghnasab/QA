@@ -22,5 +22,10 @@ class QuestionSeeder extends Seeder
             'body' => "q{$sequence->index}",
             'answer' => "a{$sequence->index}",
         ])->create();
+
+        Question::factory(20)->sequence(fn($sequence) => [
+            'body' => "q1{$sequence->index}",
+            'answer' => "a1{$sequence->index}",
+        ])->create();
     }
 }

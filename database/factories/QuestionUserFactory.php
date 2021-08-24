@@ -2,18 +2,20 @@
 
 namespace Database\Factories;
 
+use App\Enums\PracticeStatusEnum;
 use App\Models\Question;
+use App\Models\QuestionUser;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class QuestionFactory extends Factory
+class QuestionUserFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var string
      */
-    protected $model = Question::class;
+    protected $model = QuestionUser::class;
 
     /**
      * Define the model's default state.
@@ -22,11 +24,10 @@ class QuestionFactory extends Factory
      */
     public function definition()
     {
-        $text = $this->faker->text(5);
         return [
-            'body' => "q{$text}",
-            'answer' => "q{$text}",
+            'question_id' => Question::factory()->create(),
             'user_id' => User::factory()->create(),
+            'status' => $this->faker->randomElement([PracticeStatusEnum::Correct, PracticeStatusEnum::Incorrect]),
         ];
     }
 }
