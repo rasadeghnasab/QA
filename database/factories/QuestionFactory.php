@@ -25,7 +25,7 @@ class QuestionFactory extends Factory
         $text = $this->faker->numberBetween(1000, 2000);
         return [
             'body' => "q{$text}",
-            'answer' => "q{$text}",
+            'answer' => "a{$text}",
             'user_id' => User::factory()->create(),
         ];
     }
