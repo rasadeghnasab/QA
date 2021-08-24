@@ -39,7 +39,7 @@ class Practice implements StateInterface
             ->orWhereNull('question_user.user_id')
             ->get();
 
-        if ($practices->isEmpty() || $practices->where('status', '!=', 'Correct')->isEmpty()) {
+        if ($practices->isEmpty() || $practices->where('status', '!=', PracticeStatusEnum::Correct)->isEmpty()) {
             $this->command->warn('No question to ask.');
             $result = $this->command->confirm('Want to Add one?', true);
 
@@ -58,7 +58,7 @@ class Practice implements StateInterface
      */
     private function drawProgressTable($practices): void
     {
-        $correct = $practices->where('status', 'Correct');
+        $correct = $practices->where('status', PracticeStatusEnum::Correct);
         $completed = 0;
 
         if ($total = $practices->count()) {
@@ -127,7 +127,7 @@ class Practice implements StateInterface
      */
     private function askQuestion($practices): void
     {
-        $notCorrectPractices = $practices->where('status', '!=', 'Correct');
+        $notCorrectPractices = $practices->where('status', '!=', PracticeStatusEnum::Correct);
         $firstNotCorrect = $notCorrectPractices->first();
 
         $selected = $this->command->choice(
@@ -143,24 +143,26 @@ class Practice implements StateInterface
         $status = $practice->answer === $userAnswer ? PracticeStatusEnum::Correct : PracticeStatusEnum::Incorrect;
         $this->command->warn($status);
 
-        if ($practice->status === PracticeStatusEnum::NotAnswered) {
-            QuestionUser::create([
-                                     'user_id' => $this->command->user()->id,
-                                     'question_id' => $practice->id,
-                                     'status' => $status,
-                                 ]);
-
-            return;
-        }
-
+//        if ($practice->status === PracticeStatusEnum::NotAnswered) {
+//            QuestionUser::create([
+//                                     'user_id' => $this->command->user()->id,
+//                                     'question_id' => $practice->id,
+//                                     'status' => $status,
+//                                 ]);
+//
+//            return;
+//        }
+//
         QuestionUser::updateOrCreate([
                                          'user_id' => $this->command->user()->id,
                                          'question_id' => $practice->id,
+                                     ], [
+                                         'status' => $status
                                      ]);
-
-        QuestionUser::where('user_id', '=', $this->command->user()->id)
-            ->where('question_id', '=', $practice->id)
-            ->update(['status' => $status]);
+//
+//        QuestionUser::where('user_id', '=', $this->command->user()->id)
+//            ->where('question_id', '=', $practice->id)
+//            ->update(['status' => $status]);
     }
 
     private function getInputs(string $questionBody): string

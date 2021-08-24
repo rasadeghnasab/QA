@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\QACommand;
 
+use App\Enums\PracticeStatusEnum;
 use App\Models\Question;
 use App\StateMachines\Machines\QA\QAStatesEnum;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -44,7 +45,7 @@ class PracticeTest extends QATestCase
         }
 
         $notCorrect = $this->user->questions()
-            ->where('Status', '!=', 'Correct')
+            ->where('Status', '!=', PracticeStatusEnum::Correct)
             ->get(['id', 'body', 'status']);
 
         $firstElement = $this->user->questions()->find($notCorrect->first()->id);
@@ -61,19 +62,19 @@ class PracticeTest extends QATestCase
                 $notCorrect->pluck('body', 'id')->toArray()
             )
             ->expectsQuestion($firstElement->body, $firstElement->answer)
-            ->expectsOutput('Correct')
+            ->expectsOutput(PracticeStatusEnum::getDescription(PracticeStatusEnum::Correct))
             ->expectsConfirmation('Continue?', 'no');
 
         $this->assertDatabaseHas('questions', [
             'id' => $firstElement->id,
-            'status' => 'Correct'
+            'status' => PracticeStatusEnum::Correct
         ]);
     }
 
     private function practiceTableFooter(array $statuses): array
     {
-        $total = $statuses['Not answered'] + $statuses['Correct'] + $statuses['Incorrect'];
-        $progress = $statuses['Correct'] * 100 / $total;
+        $total = $statuses[PracticeStatusEnum::NotAnswered] + $statuses[PracticeStatusEnum::Correct] + $statuses[PracticeStatusEnum::Incorrect];
+        $progress = $statuses[PracticeStatusEnum::Correct] * 100 / $total;
 
         return [
             [
@@ -130,7 +131,7 @@ class PracticeTest extends QATestCase
         }
 
         $notCorrect = $this->user->questions()
-            ->where('Status', '!=', 'Correct')
+            ->where('Status', '!=', PracticeStatusEnum::Correct)
             ->get(['id', 'body', 'status']);
 
         $firstElement = $this->user->questions()->find($notCorrect->first()->id);
@@ -149,13 +150,13 @@ class PracticeTest extends QATestCase
                 $notCorrect->pluck('body', 'id')->toArray()
             )
             ->expectsQuestion($firstElement->body, $wrongAnswer)
-            ->expectsOutput('Incorrect')
+            ->expectsOutput(PracticeStatusEnum::getDescription(PracticeStatusEnum::Incorrect))
             ->expectsConfirmation('Continue?', 'no')
             ->expectsChoice('Choose one option', QAStatesEnum::Exit, QAStatesEnum::mainMenu());
 
         $this->assertDatabaseHas('questions', [
             'id' => $firstElement->id,
-            'status' => 'Incorrect'
+            'status' => PracticeStatusEnum::Incorrect
         ]);
     }
 
@@ -171,7 +172,7 @@ class PracticeTest extends QATestCase
         }
 
         $notCorrect = $this->user->questions()
-            ->where('Status', '!=', 'Correct')
+            ->where('Status', '!=', PracticeStatusEnum::Correct)
             ->get(['id', 'body', 'status']);
 
         $firstElement = $this->user->questions()->find($notCorrect->first()->id);
@@ -204,23 +205,23 @@ class PracticeTest extends QATestCase
         return [
             [
                 'statuses' => [
-                    'Not answered' => 10,
-                    'Correct' => 5,
-                    'Incorrect' => 5,
+                    PracticeStatusEnum::NotAnswered => 10,
+                    PracticeStatusEnum::Correct => 5,
+                    PracticeStatusEnum::Incorrect => 5,
                 ],
             ],
             [
                 'statuses' => [
-                    'Not answered' => 20,
-                    'Correct' => 0,
-                    'Incorrect' => 0,
+                    PracticeStatusEnum::NotAnswered => 20,
+                    PracticeStatusEnum::Correct => 0,
+                    PracticeStatusEnum::Incorrect => 0,
                 ],
             ],
             [
                 'statuses' => [
-                    'Not answered' => 0,
-                    'Correct' => 0,
-                    'Incorrect' => 20,
+                    PracticeStatusEnum::NotAnswered => 0,
+                    PracticeStatusEnum::Correct => 0,
+                    PracticeStatusEnum::Incorrect => 20,
                 ],
             ],
         ];

@@ -2,16 +2,12 @@
 
 namespace App\Enums;
 
+use BenSampo\Enum\Contracts\LocalizedEnum;
 use BenSampo\Enum\Enum;
 
-/**
- * @method static static OptionOne()
- * @method static static OptionTwo()
- * @method static static OptionThree()
- */
-final class PracticeStatusEnum extends Enum
+final class PracticeStatusEnum extends Enum implements LocalizedEnum
 {
-    const NotAnswered = 'Not answered';
-    const Correct = 'Correct';
-    const Incorrect = 'Incorrect';
+    const NotAnswered = 0;
+    const Correct = 1;
+    const Incorrect = 2;
 }
