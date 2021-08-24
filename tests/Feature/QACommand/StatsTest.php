@@ -19,8 +19,12 @@ class StatsTest extends QATestCase
      * @param string $correct_percentage
      * @param array $statuses
      */
-    public function test_stats_table_should_be_as_we_expected(int $total, string $answered_percentage, string $correct_percentage, array $statuses): void
-    {
+    public function test_stats_table_should_be_as_we_expected(
+        int $total,
+        string $answered_percentage,
+        string $correct_percentage,
+        array $statuses
+    ): void {
         foreach ($statuses as $status => $count) {
             Question::factory($count)->create(['user_id' => $this->user->id, 'status' => $status]);
         }

@@ -4,16 +4,14 @@ namespace App\StateMachines\Machines\QA;
 
 use App\StateMachines\Interfaces\StateInterface;
 use App\StateMachines\Interfaces\StateMachineMapInterface;
-use App\StateMachines\Machines\QA\States\{
-    AddQuestion,
+use App\StateMachines\Machines\QA\States\{AddQuestion,
     Authenticate,
     ExitApp,
     ListQuestions,
     MainMenu,
     Practice,
     Reset,
-    Stats,
-};
+    Stats,};
 use Illuminate\Console\Command;
 
 class QAMap implements StateMachineMapInterface

@@ -45,14 +45,22 @@ class Authenticate implements StateInterface
         return QAStatesEnum::Authenticate;
     }
 
-    public function name(): string
+    private function getInputs(): array
     {
-        return self::class;
-    }
+        $question = "Enter your email address\n If the email doesn't exist it will be created";
+//        $question = "Enter your email address";
+        $email = $this->command->ask($question, 'test@test.com');
+        $data = ['email' => $email];
 
-    public function action(): string
-    {
-        return QAStatesEnum::Authenticate;
+        $password = '';
+        if ($this->withPassword) {
+            $password = $this->command->secret('Enter your password');
+            $data['password'] = $password;
+        }
+
+        $this->validate($data);
+
+        return [$email, $password];
     }
 
     /**
@@ -76,21 +84,13 @@ class Authenticate implements StateInterface
         }
     }
 
-    private function getInputs(): array
+    public function name(): string
     {
-        $question = "Enter your email address\n If the email doesn't exist it will be created";
-//        $question = "Enter your email address";
-        $email = $this->command->ask($question, 'test@test.com');
-        $data = ['email' => $email];
+        return self::class;
+    }
 
-        $password = '';
-        if ($this->withPassword) {
-            $password = $this->command->secret('Enter your password');
-            $data['password'] = $password;
-        }
-
-        $this->validate($data);
-
-        return [$email, $password];
+    public function action(): string
+    {
+        return QAStatesEnum::Authenticate;
     }
 }

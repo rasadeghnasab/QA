@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\QACommand;
 
-use App\Models\Question;
 use App\StateMachines\Machines\QA\QAStatesEnum;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Feature\QATestCase;

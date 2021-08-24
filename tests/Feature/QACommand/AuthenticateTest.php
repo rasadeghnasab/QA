@@ -29,7 +29,10 @@ class AuthenticateTest extends QATestCase
     public function test_authentication_with_no_password_required(): void
     {
         $this->artisan('qanda:interactive')
-            ->expectsQuestion("Enter your email address\n If the email doesn't exist it will be created", $this->user->email)
+            ->expectsQuestion(
+                "Enter your email address\n If the email doesn't exist it will be created",
+                $this->user->email
+            )
             ->expectsOutput('You logged in successfully')
             ->expectsOutput("User: {$this->user->email}");
     }
@@ -37,9 +40,15 @@ class AuthenticateTest extends QATestCase
     public function test_authentication_wrong_email_provided()
     {
         $this->artisan('qanda:interactive')
-            ->expectsQuestion("Enter your email address\n If the email doesn't exist it will be created", 'not_an_email')
+            ->expectsQuestion(
+                "Enter your email address\n If the email doesn't exist it will be created",
+                'not_an_email'
+            )
             ->expectsOutput('The email must be a valid email address.')
-            ->expectsQuestion("Enter your email address\n If the email doesn't exist it will be created", 'test@test.com');
+            ->expectsQuestion(
+                "Enter your email address\n If the email doesn't exist it will be created",
+                'test@test.com'
+            );
     }
 
     public function test_authentication_no_email_provided(): void
@@ -47,13 +56,19 @@ class AuthenticateTest extends QATestCase
         $this->artisan('qanda:interactive')
             ->expectsQuestion("Enter your email address\n If the email doesn't exist it will be created", '')
             ->expectsOutput('The email field is required.')
-            ->expectsQuestion("Enter your email address\n If the email doesn't exist it will be created", 'test@test.com');
+            ->expectsQuestion(
+                "Enter your email address\n If the email doesn't exist it will be created",
+                'test@test.com'
+            );
     }
 
     public function test_full_authentication_short_password_provided(): void
     {
         $this->artisan('qanda:interactive --with-password')
-            ->expectsQuestion("Enter your email address\n If the email doesn't exist it will be created", $this->user->email)
+            ->expectsQuestion(
+                "Enter your email address\n If the email doesn't exist it will be created",
+                $this->user->email
+            )
             ->expectsQuestion("Enter your password", 'short')
             ->expectsOutput('The password must be at least 8 characters.');
     }
@@ -61,7 +76,10 @@ class AuthenticateTest extends QATestCase
     public function test_authentication_no_password_provided(): void
     {
         $this->artisan('qanda:interactive --with-password')
-            ->expectsQuestion("Enter your email address\n If the email doesn't exist it will be created", $this->user->email)
+            ->expectsQuestion(
+                "Enter your email address\n If the email doesn't exist it will be created",
+                $this->user->email
+            )
             ->expectsQuestion("Enter your password", '')
             ->expectsOutput('The password field is required.');
     }
@@ -69,7 +87,10 @@ class AuthenticateTest extends QATestCase
     public function test_authentication_show_main_menu_after_successful_login(): void
     {
         $this->artisan('qanda:interactive --with-password')
-            ->expectsQuestion("Enter your email address\n If the email doesn't exist it will be created", $this->user->email)
+            ->expectsQuestion(
+                "Enter your email address\n If the email doesn't exist it will be created",
+                $this->user->email
+            )
             ->expectsQuestion("Enter your password", 'password')
             ->expectsOutput('You logged in successfully')
             ->expectsOutput("User: {$this->user->email}")

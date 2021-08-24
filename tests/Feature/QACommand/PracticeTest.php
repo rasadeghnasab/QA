@@ -51,8 +51,15 @@ class PracticeTest extends QATestCase
 
         $this->login()
             ->expectsChoice('Choose one option', QAStatesEnum::Practice, QAStatesEnum::mainMenu())
-            ->expectsTable(['ID', 'Question', 'Status'], [...$notCorrect->toArray(), ...$this->practiceTableFooter($statuses)])
-            ->expectsChoice('Choose one of the questions above', $firstElement->body, $notCorrect->pluck('body', 'id')->toArray())
+            ->expectsTable(
+                ['ID', 'Question', 'Status'],
+                [...$notCorrect->toArray(), ...$this->practiceTableFooter($statuses)]
+            )
+            ->expectsChoice(
+                'Choose one of the questions above',
+                $firstElement->body,
+                $notCorrect->pluck('body', 'id')->toArray()
+            )
             ->expectsQuestion($firstElement->body, $firstElement->answer)
             ->expectsOutput('Correct')
             ->expectsConfirmation('Continue?', 'no');
@@ -61,6 +68,54 @@ class PracticeTest extends QATestCase
             'id' => $firstElement->id,
             'status' => 'Correct'
         ]);
+    }
+
+    private function practiceTableFooter(array $statuses): array
+    {
+        $total = $statuses['Not answered'] + $statuses['Correct'] + $statuses['Incorrect'];
+        $progress = $statuses['Correct'] * 100 / $total;
+
+        return [
+            [
+                new TableCell(
+                    '',
+                    [
+                        'colspan' => 3,
+                        'style' => new TableCellStyle([
+                                                          'align' => 'center',
+                                                          'fg' => 'white',
+                                                          'bg' => 'cyan',
+                                                      ])
+                    ]
+                ),
+            ],
+            [
+                new TableCell(
+                    sprintf('Correct answers: %%%s', $progress),
+                    [
+                        'colspan' => 3,
+                        'style' => new TableCellStyle([
+                                                          'align' => 'center',
+                                                          'fg' => 'white',
+                                                          'bg' => 'cyan',
+                                                      ])
+                    ]
+                ),
+            ],
+            [
+                new TableCell(
+                    '',
+                    [
+                        'colspan' => 3,
+                        'style' => new TableCellStyle([
+                                                          'align' => 'center',
+                                                          'fg' => 'white',
+                                                          'bg' => 'cyan',
+                                                      ])
+                    ]
+                ),
+            ],
+        ];
     }
 
     /**
@@ -84,8 +139,15 @@ class PracticeTest extends QATestCase
 
         $this->login()
             ->expectsChoice('Choose one option', QAStatesEnum::Practice, QAStatesEnum::mainMenu())
-            ->expectsTable(['ID', 'Question', 'Status'], [...$notCorrect->toArray(), ...$this->practiceTableFooter($statuses)])
-            ->expectsChoice('Choose one of the questions above', $firstElement->body, $notCorrect->pluck('body', 'id')->toArray())
+            ->expectsTable(
+                ['ID', 'Question', 'Status'],
+                [...$notCorrect->toArray(), ...$this->practiceTableFooter($statuses)]
+            )
+            ->expectsChoice(
+                'Choose one of the questions above',
+                $firstElement->body,
+                $notCorrect->pluck('body', 'id')->toArray()
+            )
             ->expectsQuestion($firstElement->body, $wrongAnswer)
             ->expectsOutput('Incorrect')
             ->expectsConfirmation('Continue?', 'no')
@@ -119,8 +181,15 @@ class PracticeTest extends QATestCase
 
         $this->login()
             ->expectsChoice('Choose one option', QAStatesEnum::Practice, QAStatesEnum::mainMenu())
-            ->expectsTable(['ID', 'Question', 'Status'], [...$notCorrect->toArray(), ...$this->practiceTableFooter($statuses)])
-            ->expectsChoice('Choose one of the questions above', $firstElement->body, $notCorrect->pluck('body', 'id')->toArray())
+            ->expectsTable(
+                ['ID', 'Question', 'Status'],
+                [...$notCorrect->toArray(), ...$this->practiceTableFooter($statuses)]
+            )
+            ->expectsChoice(
+                'Choose one of the questions above',
+                $firstElement->body,
+                $notCorrect->pluck('body', 'id')->toArray()
+            )
             ->expectsQuestion($firstElement->body, $emptyAnswer)
             ->expectsOutput('The answer field is required.')
             ->expectsQuestion($firstElement->body, $shortAnswer)
@@ -153,54 +222,6 @@ class PracticeTest extends QATestCase
                     'Correct' => 0,
                     'Incorrect' => 20,
                 ],
-            ],
-        ];
-    }
-
-    private function practiceTableFooter(array $statuses): array
-    {
-        $total = $statuses['Not answered'] + $statuses['Correct'] + $statuses['Incorrect'];
-        $progress = $statuses['Correct'] * 100 / $total;
-
-        return [
-            [
-                new TableCell(
-                    '',
-                    [
-                        'colspan' => 3,
-                        'style' => new TableCellStyle([
-                            'align' => 'center',
-                            'fg' => 'white',
-                            'bg' => 'cyan',
-                        ])
-                    ]
-                ),
-            ],
-            [
-                new TableCell(
-                    sprintf('Correct answers: %%%s', $progress),
-                    [
-                        'colspan' => 3,
-                        'style' => new TableCellStyle([
-                            'align' => 'center',
-                            'fg' => 'white',
-                            'bg' => 'cyan',
-                        ])
-                    ]
-                ),
-            ],
-            [
-                new TableCell(
-                    '',
-                    [
-                        'colspan' => 3,
-                        'style' => new TableCellStyle([
-                            'align' => 'center',
-                            'fg' => 'white',
-                            'bg' => 'cyan',
-                        ])
-                    ]
-                ),
             ],
         ];
     }

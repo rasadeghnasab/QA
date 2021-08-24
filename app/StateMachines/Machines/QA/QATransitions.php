@@ -21,6 +21,20 @@ class QATransitions implements TransitionsInterface
         $this->fillTransitions($map);
     }
 
+    private function fillTransitions(StateMachineMapInterface $map): void
+    {
+        foreach ($map->path() as $transition) {
+            $action = $transition['action'] ?? null;
+
+            $this->addTransition(new Transition($transition['source'], $transition['destination'], $action));
+        }
+    }
+
+    public function addTransition(TransitionInterface $transition): void
+    {
+        $this->transitions[] = $transition;
+    }
+
     public function next(StateInterface $state, string $action): StateInterface
     {
         foreach ($this->transitions as $transition) {
@@ -39,11 +53,6 @@ class QATransitions implements TransitionsInterface
         return $this->transitions;
     }
 
-    public function addTransition(TransitionInterface $transition): void
-    {
-        $this->transitions[] = $transition;
-    }
-
     public function addTransitions(array $transitions): void
     {
         foreach ($transitions as $transition) {
@@ -59,14 +68,5 @@ class QATransitions implements TransitionsInterface
     public function exitState(): StateInterface
     {
         return $this->map->exitState();
-    }
-
-    private function fillTransitions(StateMachineMapInterface $map): void
-    {
-        foreach ($map->path() as $transition) {
-            $action = $transition['action'] ?? null;
-
-            $this->addTransition(new Transition($transition['source'], $transition['destination'], $action));
-        }
     }
 }

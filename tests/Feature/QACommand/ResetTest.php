@@ -18,8 +18,11 @@ class ResetTest extends QATestCase
      * @param array $statuses
      * @param int $not_answered_expected
      */
-    public function test_confirmed_reset_should_change_all_questions_status_to_not_answered(string $confirm, array $statuses, int $not_answered_expected): void
-    {
+    public function test_confirmed_reset_should_change_all_questions_status_to_not_answered(
+        string $confirm,
+        array $statuses,
+        int $not_answered_expected
+    ): void {
         foreach ($statuses as $status => $count) {
             Question::factory($count)->create(['user_id' => $this->user->id, 'status' => $status]);
         }

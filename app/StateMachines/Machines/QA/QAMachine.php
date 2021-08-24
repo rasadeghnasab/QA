@@ -2,22 +2,9 @@
 
 namespace App\StateMachines\Machines\QA;
 
-use App\StateMachines\Interfaces\StateInterface;
-use App\StateMachines\Interfaces\TransitionInterface;
-use App\StateMachines\Interfaces\TransitionsInterface;
-use App\StateMachines\Transition;
-use Illuminate\Console\Command;
 use App\StateMachines\Interfaces\MachineInterface;
-use App\StateMachines\Machines\QA\States\{
-    AddQuestion,
-    Authenticate,
-    ExitApp,
-    ListQuestions,
-    MainMenu,
-    Practice,
-    Reset,
-    Stats,
-};
+use App\StateMachines\Interfaces\TransitionsInterface;
+use Illuminate\Console\Command;
 
 class QAMachine implements MachineInterface
 {

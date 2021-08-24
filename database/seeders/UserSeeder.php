@@ -21,9 +21,9 @@ class UserSeeder extends Seeder
         $password = 'password';
 
         User::factory()->create([
-            'email' => 'test@test.com',
-            'password' => Hash::make('password'),
-        ]);
+                                    'email' => 'test@test.com',
+                                    'password' => Hash::make('password'),
+                                ]);
 
         $userInfo = <<<EOT
 <bg=cyan;fg=bright-white>\t User: {$email} </>

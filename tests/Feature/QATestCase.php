@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Testing\PendingCommand;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Tests\TestCase;
@@ -20,13 +19,6 @@ class QATestCase extends TestCase
         $this->user = User::factory()->create();
     }
 
-    protected function login()
-    {
-        return $this->artisan('qanda:interactive')
-            ->expectsQuestion("Enter your email address\n If the email doesn't exist it will be created", $this->user->email)
-            ->expectsOutput('You logged in successfully');
-    }
-
     /**
      * Specify a table that should be printed when the command runs.
      *
@@ -37,8 +29,13 @@ class QATestCase extends TestCase
      * @param string $tableStyle
      * @return $this
      */
-    public function expectsTitledTable($headers, $rows, string $header = '', string $footer = '', $tableStyle = 'default')
-    {
+    public function expectsTitledTable(
+        $headers,
+        $rows,
+        string $header = '',
+        string $footer = '',
+        $tableStyle = 'default'
+    ) {
         $table = (new Table($output = new BufferedOutput))
             ->setHeaders((array)$headers)
             ->setRows($rows instanceof Arrayable ? $rows->toArray() : $rows)
@@ -63,5 +60,15 @@ class QATestCase extends TestCase
         }
 
         return $this;
+    }
+
+    protected function login()
+    {
+        return $this->artisan('qanda:interactive')
+            ->expectsQuestion(
+                "Enter your email address\n If the email doesn't exist it will be created",
+                $this->user->email
+            )
+            ->expectsOutput('You logged in successfully');
     }
 }
