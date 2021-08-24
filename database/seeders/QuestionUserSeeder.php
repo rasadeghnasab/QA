@@ -16,6 +16,8 @@ class QuestionUserSeeder extends Seeder
      */
     public function run()
     {
+        QuestionUser::truncate();
+
         $users = User::where('email', '!=', 'test@test.com')->get();
         $questions = Question::all()->shuffle();
 

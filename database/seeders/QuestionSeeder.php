@@ -15,6 +15,8 @@ class QuestionSeeder extends Seeder
      */
     public function run()
     {
+        Question::truncate();
+
         $user = User::where('email', 'test@test.com')->first();
 
         Question::factory(5)->sequence(fn($sequence) => [
