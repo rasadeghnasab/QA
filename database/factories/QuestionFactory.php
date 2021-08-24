@@ -22,7 +22,7 @@ class QuestionFactory extends Factory
      */
     public function definition()
     {
-        $text = $this->faker->text(5);
+        $text = $this->faker->numberBetween(1000, 2000);
         return [
             'body' => "q{$text}",
             'answer' => "q{$text}",

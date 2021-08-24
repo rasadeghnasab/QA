@@ -2,6 +2,7 @@
 
 namespace App\StateMachines\Machines\QA\States;
 
+use App\Models\QuestionUser;
 use App\StateMachines\Interfaces\StateInterface;
 use App\StateMachines\Machines\QA\QAStatesEnum;
 use Illuminate\Console\Command;
@@ -21,8 +22,8 @@ class Reset implements StateInterface
             return QAStatesEnum::MainMenu;
         }
 
-        $this->command->user()->questions()->update(['status' => 'Not answered']);
-        $this->command->warn('Your questions are marked as `Not answered`.');
+        QuestionUser::query()->delete();
+        $this->command->warn('The practice reset successfully.');
 
         return QAStatesEnum::MainMenu;
     }

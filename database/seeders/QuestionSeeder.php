@@ -17,15 +17,15 @@ class QuestionSeeder extends Seeder
     {
         $user = User::where('email', 'test@test.com')->first();
 
-        Question::factory(10)->sequence(fn($sequence) => [
+        Question::factory(5)->sequence(fn($sequence) => [
             'user_id' => $user->id,
             'body' => "q{$sequence->index}",
             'answer' => "a{$sequence->index}",
         ])->create();
 
-        Question::factory(20)->sequence(fn($sequence) => [
-            'body' => "q1{$sequence->index}",
-            'answer' => "a1{$sequence->index}",
+        Question::factory(5)->sequence(fn($sequence) => [
+            'body' => "qf{$sequence->index}",
+            'answer' => "af{$sequence->index}",
         ])->create();
     }
 }
