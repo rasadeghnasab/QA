@@ -21,13 +21,20 @@ class Stats implements StateInterface
     public function handle(): string
     {
         $all = Question::count();
-        $answered = QuestionUser::count();
-        $correct = QuestionUser::where('status', PracticeStatusEnum::Correct)->count();
+
+        $answered = $correct = 0;
+        if ($all > 0) {
+            $answered = QuestionUser::count();
+            $correct = QuestionUser::where('status', PracticeStatusEnum::Correct)->count();
+
+            $answered = number_format($answered * 100 / $all);
+            $correct = number_format($correct * 100 / $all);
+        }
 
         $this->command->table(['Title', 'Value'], [
             ['Total', $all],
-            ['Answered', sprintf('%%%s', number_format($answered * 100 / $all))],
-            ['Correct', sprintf('%%%s', number_format($correct * 100 / $all))]
+            ['Answered', sprintf('%%%s', $answered)],
+            ['Correct', sprintf('%%%s', $correct)]
         ]);
         $this->command->newLine();
 
