@@ -3,7 +3,6 @@
 namespace App\StateMachines\Machines\QA\States;
 
 use App\Enums\PracticeStatusEnum;
-use App\Models\Question;
 use App\Models\QuestionUser;
 use App\StateMachines\Interfaces\StateInterface;
 use App\StateMachines\Machines\QA\QAStatesEnum;
@@ -25,15 +24,15 @@ class Practice implements StateInterface
 
     public function handle(): string
     {
-        $practices = Question::select(
+        $practices = QuestionUser::select(
             'questions.id',
             'questions.body',
             'questions.answer',
             DB::raw(sprintf("IFNULL(question_user.status, '%s') as `status`", PracticeStatusEnum::NotAnswered))
-        )->leftJoin(
-            'question_user',
+        )->rightJoin(
+            'questions',
+            'question_user.question_id',
             'questions.id',
-            'question_user.question_id'
         )
             ->where('question_user.user_id', '=', $this->command->user()->id)
             ->orWhereNull('question_user.user_id')
@@ -65,7 +64,7 @@ class Practice implements StateInterface
             $completed = number_format($correct->count() * 100 / $total);
         }
         $notCorrectQuestions = $practices->map(function ($question) {
-            return $question->only(['id', 'body', 'status']);
+            return $question->only(['id', 'body', 'statusName']);
         })->toArray();
 
         $progressFooter = $this->practiceTableFooter($completed);
@@ -128,6 +127,7 @@ class Practice implements StateInterface
     private function askQuestion($practices): void
     {
         $notCorrectPractices = $practices->where('status', '!=', PracticeStatusEnum::Correct);
+//        dd($notCorrectPractices->toArray());
         $firstNotCorrect = $notCorrectPractices->first();
 
         $selected = $this->command->choice(
@@ -141,28 +141,21 @@ class Practice implements StateInterface
         $userAnswer = $this->getInputs($practice->body);
 
         $status = $practice->answer === $userAnswer ? PracticeStatusEnum::Correct : PracticeStatusEnum::Incorrect;
-        $this->command->warn($status);
+        $this->command->warn(PracticeStatusEnum::getDescription($status));
 
-//        if ($practice->status === PracticeStatusEnum::NotAnswered) {
-//            QuestionUser::create([
-//                                     'user_id' => $this->command->user()->id,
-//                                     'question_id' => $practice->id,
-//                                     'status' => $status,
-//                                 ]);
-//
-//            return;
-//        }
-//
-        QuestionUser::updateOrCreate([
-                                         'user_id' => $this->command->user()->id,
-                                         'question_id' => $practice->id,
-                                     ], [
-                                         'status' => $status
-                                     ]);
-//
-//        QuestionUser::where('user_id', '=', $this->command->user()->id)
-//            ->where('question_id', '=', $practice->id)
-//            ->update(['status' => $status]);
+        if ($practice->status === PracticeStatusEnum::NotAnswered) {
+            QuestionUser::create([
+                                     'user_id' => $this->command->user()->id,
+                                     'question_id' => $practice->id,
+                                     'status' => $status,
+                                 ]);
+
+            return;
+        }
+
+        QuestionUser::where('user_id', '=', $this->command->user()->id)
+            ->where('question_id', '=', $practice->id)
+            ->update(['status' => $status]);
     }
 
     private function getInputs(string $questionBody): string

@@ -12,6 +12,10 @@ class QuestionUser extends Pivot
 
     protected $fillable = ['question_id', 'user_id', 'status'];
 
+    protected $casts = [
+        'status' => 'integer',
+    ];
+
     public function getStatusNameAttribute(): string
     {
         return PracticeStatusEnum::getDescription($this->attributes['status']);
