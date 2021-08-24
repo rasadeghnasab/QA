@@ -17,12 +17,10 @@ class QuestionSeeder extends Seeder
     {
         $user = User::where('email', 'test@test.com')->first();
 
-        for ($i = 0; $i < 10; $i++) {
-            Question::factory()->create([
-                'user_id' => $user->id,
-                'body' => "q{$i}",
-                'answer' => "a{$i}",
-            ]);
-        }
+        Question::factory(10)->sequence(fn($sequence) => [
+            'user_id' => $user->id,
+            'body' => "q{$sequence->index}",
+            'answer' => "a{$sequence->index}",
+        ])->create();
     }
 }

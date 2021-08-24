@@ -26,7 +26,6 @@ class QuestionFactory extends Factory
             'body' => $this->faker->text(100),
             'answer' => $this->faker->text(20),
             'user_id' => User::factory()->create(),
-            'status' => $this->faker->randomElement(['Not answered', 'Correct', 'Incorrect']),
         ];
     }
 }
