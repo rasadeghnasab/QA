@@ -20,6 +20,47 @@ class Stats implements StateInterface
 
     public function handle(): string
     {
+        /**
+         * Assigment requested this
+         * general stats
+         */
+        list($header, $data) = $this->simple();
+
+        /**
+         * Extra
+         * users score board.
+         */
+//        list($header, $data) = $this->scoreBoard();
+
+        $this->command->table($header, $data);
+
+        $this->command->newLine();
+
+        return QAStatesEnum::MainMenu;
+    }
+
+    /**
+     * Returns scoreboard data and header
+     * Shows a list of users who have answered questions and the number of
+     *
+     * @return array
+     */
+    private function scoreBoard(): array
+    {
+        $scoreBoard = QuestionUser::scoreBoard()->get()->toArray();
+        $header = [
+            'name',
+            'email',
+            'total answered',
+            'incorrect',
+            'correct',
+        ];
+
+        return [$header, $scoreBoard];
+    }
+
+    private function simple(): array
+    {
         $all = Question::count();
 
         $answered = $correct = 0;
@@ -31,14 +72,14 @@ class Stats implements StateInterface
             $correct = number_format($correct * 100 / $all);
         }
 
-        $this->command->table(['Title', 'Value'], [
+        $header = ['Title', 'Value'];
+        $data = [
             ['Total', $all],
             ['Answered', sprintf('%%%s', $answered)],
             ['Correct', sprintf('%%%s', $correct)]
-        ]);
-        $this->command->newLine();
+        ];
 
-        return QAStatesEnum::MainMenu;
+        return [$header, $data];
     }
 
     public function name(): string

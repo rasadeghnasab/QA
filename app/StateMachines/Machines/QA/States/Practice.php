@@ -7,7 +7,6 @@ use App\Models\QuestionUser;
 use App\StateMachines\Interfaces\StateInterface;
 use App\StateMachines\Machines\QA\QAStatesEnum;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\Console\Helper\TableCell;
@@ -24,19 +23,10 @@ class Practice implements StateInterface
 
     public function handle(): string
     {
-        $practices = QuestionUser::select(
-            'questions.id',
-            'questions.body',
-            'questions.answer',
-            DB::raw(sprintf("IFNULL(question_user.status, '%s') as `status`", PracticeStatusEnum::NotAnswered))
-        )->rightJoin(
-            'questions',
-            'question_user.question_id',
-            'questions.id',
-        )
-            ->where('question_user.user_id', '=', $this->command->user()->id)
-            ->orWhereNull('question_user.user_id')
-            ->get();
+        /**
+         * Gets all the questions + and determine if they already answered by the user or not?
+         */
+        $practices = $this->command->user()->practiceQuestions()->get();
 
         if ($practices->isEmpty() || $practices->where('status', '!=', PracticeStatusEnum::Correct)->isEmpty()) {
             $this->command->warn('No question to ask.');
@@ -127,7 +117,6 @@ class Practice implements StateInterface
     private function askQuestion($practices): void
     {
         $notCorrectPractices = $practices->where('status', '!=', PracticeStatusEnum::Correct);
-//        dd($notCorrectPractices->toArray());
         $firstNotCorrect = $notCorrectPractices->first();
 
         $selected = $this->command->choice(

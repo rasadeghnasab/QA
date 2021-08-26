@@ -22,7 +22,17 @@ class Reset implements StateInterface
             return QAStatesEnum::MainMenu;
         }
 
+        /**
+         * Remove all the practices for all users
+         */
         QuestionUser::query()->delete();
+
+        /**
+         * It wasn't clear if we want to reset the current user practices or all users
+         * So if we want to only remove user practices we can do this
+         */
+        // $this->command->user()->practices()->delete();
+
         $this->command->warn('The practice reset successfully.');
 
         return QAStatesEnum::MainMenu;
