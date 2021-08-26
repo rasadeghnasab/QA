@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\PracticeStatusEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
 
 class User extends Authenticatable
 {
@@ -41,8 +42,35 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    /**
+     * Gets all the questions + and determine if they already answered by the user or not?
+     *
+     * Note: this could go to a repository instead of the User model.
+     */
+    public function practiceQuestions()
+    {
+        return QuestionUser::select(
+            'questions.id',
+            'questions.body',
+            'questions.answer',
+            DB::raw(sprintf("IFNULL(question_user.status, '%s') as `status`", PracticeStatusEnum::NotAnswered))
+        )->rightJoin(
+            'questions',
+            'question_user.question_id',
+            'questions.id',
+        )
+            ->where('question_user.user_id', '=', $this->id)
+            ->orWhereNull('question_user.user_id');
+    }
+
+
     public function questions()
     {
         return $this->hasMany(Question::class);
+    }
+
+    public function practices()
+    {
+        return $this->hasMany(QuestionUser::class);
     }
 }

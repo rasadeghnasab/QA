@@ -2,6 +2,9 @@
 
 namespace App\StateMachines\Machines\QA\States;
 
+use App\Enums\PracticeStatusEnum;
+use App\Models\Question;
+use App\Models\QuestionUser;
 use App\StateMachines\Interfaces\StateInterface;
 use App\StateMachines\Machines\QA\QAStatesEnum;
 use Illuminate\Console\Command;
@@ -17,25 +20,66 @@ class Stats implements StateInterface
 
     public function handle(): string
     {
-        $questions = $this->command->user()->questions()->get();
+        /**
+         * Assigment requested this
+         * general stats
+         */
+        list($header, $data) = $this->simpleStats();
 
-        $answered = $correct = 0;
-        if ($all = $questions->count()) {
-            $answered = $questions->whereIn('status', ['Correct', 'Incorrect'])->count();
-            $answered = number_format($answered * 100 / $all);
+        /**
+         * Extra
+         * users score board.
+         */
+//        list($header, $data) = $this->scoreBoard();
 
-            $correct = $questions->where('status', 'Correct')->count();
-            $correct = number_format($correct * 100 / $all);
-        }
+        $this->command->table($header, $data);
 
-        $this->command->table(['Title', 'Value'], [
-            ['Total', $all],
-            ['Answered', sprintf('%%%s', $answered)],
-            ['Correct', sprintf('%%%s', $correct)]
-        ]);
         $this->command->newLine();
 
         return QAStatesEnum::MainMenu;
+    }
+
+    /**
+     * Returns scoreboard data and header
+     * Shows a list of users who have answered questions and the number of
+     *
+     * @return array
+     */
+    private function usersScoreBoardStats(): array
+    {
+        $scoreBoard = QuestionUser::scoreBoard()->get()->toArray();
+        $header = [
+            'name',
+            'email',
+            'total answered',
+            'incorrect',
+            'correct',
+        ];
+
+        return [$header, $scoreBoard];
+    }
+
+    private function simpleStats(): array
+    {
+        $all = Question::count();
+
+        $answered = $correct = 0;
+        if ($all > 0) {
+            $answered = QuestionUser::count();
+            $correct = QuestionUser::where('status', PracticeStatusEnum::Correct)->count();
+
+            $answered = number_format($answered * 100 / $all);
+            $correct = number_format($correct * 100 / $all);
+        }
+
+        $header = ['Title', 'Value'];
+        $data = [
+            ['Total', $all],
+            ['Answered', sprintf('%%%s', $answered)],
+            ['Correct', sprintf('%%%s', $correct)]
+        ];
+
+        return [$header, $data];
     }
 
     public function name(): string

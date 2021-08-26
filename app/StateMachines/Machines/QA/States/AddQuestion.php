@@ -27,24 +27,14 @@ class AddQuestion implements StateInterface
 
         $this->command->user()->questions()->save(
             new Question([
-                'body' => $body,
-                'answer' => $answer,
-            ])
+                             'body' => $body,
+                             'answer' => $answer,
+                         ])
         );
 
         $this->command->info('The question has been added successfully.');
 
         return $this->command->confirm('Add another one?', true) ? QAStatesEnum::AddQuestion : QAStatesEnum::MainMenu;
-    }
-
-    public function name(): string
-    {
-        return self::class;
-    }
-
-    public function action(): string
-    {
-        return QAStatesEnum::AddQuestion;
     }
 
     /**
@@ -63,5 +53,15 @@ class AddQuestion implements StateInterface
         if ($validator->fails()) {
             throw new ValidationException($validator);
         }
+    }
+
+    public function name(): string
+    {
+        return self::class;
+    }
+
+    public function action(): string
+    {
+        return QAStatesEnum::AddQuestion;
     }
 }

@@ -2,9 +2,9 @@
 
 namespace App\StateMachines;
 
+use App\StateMachines\Interfaces\MachineInterface;
 use App\StateMachines\Interfaces\TransitionsInterface;
 use Exception;
-use App\StateMachines\Interfaces\MachineInterface;
 use Illuminate\Console\Command;
 use Illuminate\Validation\ValidationException;
 

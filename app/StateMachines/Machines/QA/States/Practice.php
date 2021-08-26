@@ -2,6 +2,8 @@
 
 namespace App\StateMachines\Machines\QA\States;
 
+use App\Enums\PracticeStatusEnum;
+use App\Models\QuestionUser;
 use App\StateMachines\Interfaces\StateInterface;
 use App\StateMachines\Machines\QA\QAStatesEnum;
 use Illuminate\Console\Command;
@@ -21,9 +23,12 @@ class Practice implements StateInterface
 
     public function handle(): string
     {
-        $practices = $this->command->user()->questions()->get(['id', 'body', 'status', 'answer']);
+        /**
+         * Gets all the questions + and determine if they already answered by the user or not?
+         */
+        $practices = $this->command->user()->practiceQuestions()->get();
 
-        if ($practices->isEmpty() || $practices->where('status', '!=', 'Correct')->isEmpty()) {
+        if ($practices->isEmpty() || $practices->where('status', '!=', PracticeStatusEnum::Correct)->isEmpty()) {
             $this->command->warn('No question to ask.');
             $result = $this->command->confirm('Want to Add one?', true);
 
@@ -37,29 +42,19 @@ class Practice implements StateInterface
         return $this->command->confirm('Continue?', true) ? QAStatesEnum::Practice : QAStatesEnum::MainMenu;
     }
 
-    public function name(): string
-    {
-        return self::class;
-    }
-
-    public function action(): string
-    {
-        return QAStatesEnum::Practice;
-    }
-
     /**
      * @param $practices
      */
     private function drawProgressTable($practices): void
     {
-        $correct = $practices->where('status', 'Correct');
+        $correct = $practices->where('status', PracticeStatusEnum::Correct);
         $completed = 0;
 
         if ($total = $practices->count()) {
             $completed = number_format($correct->count() * 100 / $total);
         }
         $notCorrectQuestions = $practices->map(function ($question) {
-            return $question->only(['id', 'body', 'status']);
+            return $question->only(['id', 'body', 'statusName']);
         })->toArray();
 
         $progressFooter = $this->practiceTableFooter($completed);
@@ -70,34 +65,86 @@ class Practice implements StateInterface
         );
     }
 
+    private function practiceTableFooter(int $progress): array
+    {
+        return [
+            [
+                new TableCell(
+                    '',
+                    [
+                        'colspan' => 3,
+                        'style' => new TableCellStyle([
+                                                          'align' => 'center',
+                                                          'fg' => 'white',
+                                                          'bg' => 'cyan',
+                                                      ])
+                    ]
+                ),
+            ],
+            [
+                new TableCell(
+                    sprintf('Correct answers: %%%s', $progress),
+                    [
+                        'colspan' => 3,
+                        'style' => new TableCellStyle([
+                                                          'align' => 'center',
+                                                          'fg' => 'white',
+                                                          'bg' => 'cyan',
+                                                      ])
+                    ]
+                ),
+            ],
+            [
+                new TableCell(
+                    '',
+                    [
+                        'colspan' => 3,
+                        'style' => new TableCellStyle([
+                                                          'align' => 'center',
+                                                          'fg' => 'white',
+                                                          'bg' => 'cyan',
+                                                      ])
+                    ]
+                ),
+            ],
+        ];
+    }
+
     /**
      * @param $practices
      * @return void
      */
     private function askQuestion($practices): void
     {
-        $notCorrectPractices = $practices->where('status', '!=', 'Correct');
+        $notCorrectPractices = $practices->where('status', '!=', PracticeStatusEnum::Correct);
         $firstNotCorrect = $notCorrectPractices->first();
 
-        $selected = $this->command->choice('Choose one of the questions above',
+        $selected = $this->command->choice(
+            'Choose one of the questions above',
             $notCorrectPractices->pluck('body', 'id')->toArray(),
             $firstNotCorrect->id ?? null,
         );
 
-        $question = $notCorrectPractices->where('body', $selected)->first();
+        $practice = $notCorrectPractices->where('body', $selected)->first();
 
-        $userAnswer = $this->getInputs($question->body);
+        $userAnswer = $this->getInputs($practice->body);
 
-        if ($question->answer === $userAnswer) {
-            $status = 'Correct';
-            $this->command->info($status);
-        } else {
-            $status = 'Incorrect';
-            $this->command->error($status);
+        $status = $practice->answer === $userAnswer ? PracticeStatusEnum::Correct : PracticeStatusEnum::Incorrect;
+        $this->command->warn(PracticeStatusEnum::getDescription($status));
+
+        if ($practice->status === PracticeStatusEnum::NotAnswered) {
+            QuestionUser::create([
+                                     'user_id' => $this->command->user()->id,
+                                     'question_id' => $practice->id,
+                                     'status' => $status,
+                                 ]);
+
+            return;
         }
 
-        $question->status = $status;
-        $question->save();
+        QuestionUser::where('user_id', '=', $this->command->user()->id)
+            ->where('question_id', '=', $practice->id)
+            ->update(['status' => $status]);
     }
 
     private function getInputs(string $questionBody): string
@@ -138,48 +185,13 @@ class Practice implements StateInterface
         }
     }
 
-    private function practiceTableFooter(int $progress): array
+    public function name(): string
     {
-        return [
-            [
-                new TableCell(
-                    '',
-                    [
-                        'colspan' => 3,
-                        'style' => new TableCellStyle([
-                            'align' => 'center',
-                            'fg' => 'white',
-                            'bg' => 'cyan',
-                        ])
-                    ]
-                ),
-            ],
-            [
-                new TableCell(
-                    sprintf('Correct answers: %%%s', $progress),
-                    [
-                        'colspan' => 3,
-                        'style' => new TableCellStyle([
-                            'align' => 'center',
-                            'fg' => 'white',
-                            'bg' => 'cyan',
-                        ])
-                    ]
-                ),
-            ],
-            [
-                new TableCell(
-                    '',
-                    [
-                        'colspan' => 3,
-                        'style' => new TableCellStyle([
-                            'align' => 'center',
-                            'fg' => 'white',
-                            'bg' => 'cyan',
-                        ])
-                    ]
-                ),
-            ],
-        ];
+        return self::class;
+    }
+
+    public function action(): string
+    {
+        return QAStatesEnum::Practice;
     }
 }
