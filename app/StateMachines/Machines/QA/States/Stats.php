@@ -24,7 +24,7 @@ class Stats implements StateInterface
          * Assigment requested this
          * general stats
          */
-        list($header, $data) = $this->simple();
+        list($header, $data) = $this->simpleStats();
 
         /**
          * Extra
@@ -45,7 +45,7 @@ class Stats implements StateInterface
      *
      * @return array
      */
-    private function scoreBoard(): array
+    private function usersScoreBoardStats(): array
     {
         $scoreBoard = QuestionUser::scoreBoard()->get()->toArray();
         $header = [
@@ -59,7 +59,7 @@ class Stats implements StateInterface
         return [$header, $scoreBoard];
     }
 
-    private function simple(): array
+    private function simpleStats(): array
     {
         $all = Question::count();
 
