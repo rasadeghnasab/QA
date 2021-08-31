@@ -3,6 +3,7 @@
 namespace App\StateMachines\Machines\QA\States;
 
 use App\Enums\PracticeStatusEnum;
+use App\Models\Choice;
 use App\Models\QuestionUser;
 use App\StateMachines\Interfaces\StateInterface;
 use App\StateMachines\Machines\QA\QAStatesEnum;
@@ -127,9 +128,9 @@ class Practice implements StateInterface
 
         $practice = $notCorrectPractices->where('body', $selected)->first();
 
-        $userAnswer = $this->getInputs($practice->body);
+        $userAnswer = $this->getInputs($practice->body, $practice->id);
 
-        $status = $practice->answer === $userAnswer ? PracticeStatusEnum::Correct : PracticeStatusEnum::Incorrect;
+        $status = $userAnswer->correct ? PracticeStatusEnum::Correct : PracticeStatusEnum::Incorrect;
         $this->command->warn(PracticeStatusEnum::getDescription($status));
 
         if ($practice->status === PracticeStatusEnum::NotAnswered) {
@@ -147,16 +148,19 @@ class Practice implements StateInterface
             ->update(['status' => $status]);
     }
 
-    private function getInputs(string $questionBody): string
+    private function getInputs(string $questionBody, int $questionId): Choice
     {
-        $answer = '';
+        $choices = Choice::whereQuestionId($questionId)->get();
 
         do {
             try {
                 $valid = true;
-                $answer = $this->command->ask($questionBody);
+                $userChoice = $this->command->choice(
+                    $questionBody,
+                    $choices->pluck('title')->all()
+                );
 
-                $this->validate(['answer' => $answer]);
+                $choice = $choices->firstWhere('title', $userChoice);
             } catch (ValidationException $validationException) {
                 foreach (collect($validationException->errors())->flatten() as $error) {
                     $this->command->warn($error);
@@ -165,7 +169,7 @@ class Practice implements StateInterface
             }
         } while (!$valid);
 
-        return $answer;
+        return $choice;
     }
 
     /**
