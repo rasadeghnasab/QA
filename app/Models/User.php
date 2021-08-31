@@ -52,7 +52,6 @@ class User extends Authenticatable
         return QuestionUser::select(
             'questions.id',
             'questions.body',
-            'questions.answer',
             DB::raw(sprintf("IFNULL(question_user.status, '%s') as `status`", PracticeStatusEnum::NotAnswered))
         )->rightJoin(
             'questions',
