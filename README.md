@@ -1,6 +1,8 @@
-# Laravel command line Q&A
+# Laravel command line finit state machine project
 
-A Q&A console app made with Laravel + Artisan
+You can clone this repository and simply create any finit state machine app of your own by using the sample code provided.
+
+Sample code is a QA console app made with Laravel + Artisan
 
 # Prerequisites
 
