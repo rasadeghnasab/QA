@@ -1,6 +1,6 @@
 # Laravel command line Q&A
 
-Q&A app made with Laravel + Artisan
+A Q&A console app made with Laravel + Artisan
 
 # Prerequisites
 
