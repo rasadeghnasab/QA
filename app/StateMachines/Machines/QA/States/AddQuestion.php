@@ -2,6 +2,7 @@
 
 namespace App\StateMachines\Machines\QA\States;
 
+use App\Models\Choice;
 use App\Models\Question;
 use App\StateMachines\Interfaces\StateInterface;
 use App\StateMachines\Machines\QA\QAStatesEnum;
@@ -21,16 +22,22 @@ class AddQuestion implements StateInterface
     public function handle(): string
     {
         $body = $this->command->ask('Enter the question body please');
-        $answer = $this->command->ask('Enter the answer please');
+        $answer = explode(',', $this->command->ask('Write all the choices separated by a comma. The first one is the correct one'));
 
-        $this->validate(['question' => $body, 'answer' => $answer]);
+        $this->validate(['question' => $body]);
 
-        $this->command->user()->questions()->save(
+        $correctChoice = array_shift($answer);
+
+        $question = $this->command->user()->questions()->save(
             new Question([
                              'body' => $body,
-                             'answer' => $answer,
                          ])
         );
+
+        (new Choice(['title' => $correctChoice, 'correct' => true, 'question_id' => $question->id]))->save();
+        foreach ($answer as $choice) {
+            (new Choice(['title' => $choice, 'correct' => false, 'question_id' => $question->id]))->save();
+        }
 
         $this->command->info('The question has been added successfully.');
 
@@ -45,7 +52,6 @@ class AddQuestion implements StateInterface
     {
         $rules = [
             'question' => ['required', 'min:2', 'max:300'],
-            'answer' => ['required', 'min:2', 'max:300'],
         ];
 
         $validator = Validator::make($data, $rules);
